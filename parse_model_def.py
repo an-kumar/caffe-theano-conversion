@@ -37,8 +37,8 @@ def parse_model_def(prototxt_path):
 
 		if params['type'] == 'CONVOLUTION' or params['type']=='Convolution':
 			params['num_output'] = find_params('num_output', lsplit)
-			params['pad'] = find_params('pad',lsplit)
-			params['stride'] = find_params('stride',lsplit)
+			params['pad'] = find_params('pad',lsplit,default=1)
+			params['stride'] = find_params('stride',lsplit, default=1)
 			params['kernel_size'] = find_params('kernel_size',lsplit)
 
 		elif params['type'] == 'INNER_PRODUCT' or params['type'] == 'InnerProduct':
