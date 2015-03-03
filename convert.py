@@ -23,15 +23,17 @@ def convert(prototxt, caffemodel):
 	last_layer = inp_layer = layers.Input2DLayer(input_dims[0], input_dims[1], input_dims[2], input_dims[3])
 
 	# go thru layers and create the theano layer 
+	all_layers = []
 	for layer in architecture:
 		this_layer = parse_layer(layer, last_layer)
 		set_params(this_layer, net, layer)
 		last_layer = this_layer
+		all_layers.append(this_layer)
 
 	X = T.tensor4('data', dtype='float32') # This will be the data we pass in; we could change this to an index into a batch for example, this is just for testing how this conversion script works
 	givens = {inp_layer.input_var:X}
-	forward = theano.function([X], last_layer.output(dropout_active=False),givens=givens)
-	return forward
+	forward = theano.function([X], [layer.output(dropout_active=False) for layer in all_layers],givens=givens)
+	return forward, net
 
 
 
@@ -129,4 +131,4 @@ def softmax_layer_from_params(layer, last_layer):
 	return layers.SoftmaxLayer(last_layer)
 
 if __name__ == '__main__':
-	forward = convert('VGG_ILSVRC_16_layers_deploy.prototxt', 'VGG_ILSVRC_16_layers.caffemodel')
+	forward, net = convert('VGG_ILSVRC_16_layers_deploy.prototxt', 'VGG_ILSVRC_16_layers.caffemodel')
