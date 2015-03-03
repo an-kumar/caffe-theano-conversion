@@ -149,7 +149,7 @@ def cuda_conv_layer_from_params(layer, last_layer):
 	else:
 		print "this will be incorrect. the caffe net is not using same convolutions (i think). you should check what their doing, go into layers.py and fix this accordingly"
 		
-	conv = cc_layers.CudaConvnetConv2DLayer(last_layer, int(layer['num_output']), int(layer['kernel_size']), -1, -1, nonlinearity=layers.identity, pad=int(layer['pad']))
+	conv = cc_layers.CudaConvnetConv2DLayer(last_layer, int(layer['num_output']), int(layer['kernel_size']), -1, -1, nonlinearity=layers.identity, pad=int(layer['pad']),stride=int(layer['stride']))
 	return conv
 
 def conv_layer_from_params(layer, last_layer):
