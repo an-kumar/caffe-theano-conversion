@@ -25,10 +25,10 @@ def convert(prototxt, caffemodel):
 
 	# create input layer
 	# this actually ends up being c01b shaped, but we pass in bc01
-	if cuda == True:
+	if cuda == False:
 		last_layer = inp_layer = layers.Input2DLayer(input_dims[0], input_dims[1], input_dims[2], input_dims[3])
 	else:
-		last_layer = inp_layer = cc_layers.CudaConvnetInput2DLayer(input_dims[0], input_dims[1], input_dims[2], input_dims[3])
+		last_layer = inp_layer = cc_layers.CudaConvnetInput2DLayer(1, input_dims[1], input_dims[2], input_dims[3])
 
 	# go thru layers and create the theano layer 
 	all_layers = []
@@ -188,4 +188,4 @@ def softmax_layer_from_params(layer, last_layer):
 	return layers.SoftmaxLayer(last_layer)
 
 if __name__ == '__main__':
-	forward, net, all_layers = convert('VGG_ILSVRC_16_layers_deploy.prototxt', 'VGG_ILSVRC_16_layers.caffemodel')
+	forward, net, all_layers = convert('/root/caffe/models/bvlc_reference_rcnn_ilsvrc13/deploy.prototxt','/root/caffe/models/bvlc_reference_rcnn_ilsvrc13/bvlc_reference_rcnn_ilsvrc13.caffemodel)
