@@ -973,7 +973,7 @@ class ResponseNormalisationLayer(object):
         scale = self.k
 
         for i in xrange(self.n):
-            scale += self.alpha * sq[:,i:i+ch,:,:]
+            scale += self.alpha/self.n * sq[:,i:i+ch,:,:]
 
         scale = scale ** self.beta
 

@@ -33,27 +33,36 @@ def parse_model_def(prototxt_path):
 			params['stride'] = find_params('stride',lsplit)
 			params['kernel_size'] = find_params('kernel_size',lsplit)
 
-		if params['type'] == 'INNER_PRODUCT':
+		elif params['type'] == 'INNER_PRODUCT':
 			params['num_output'] = find_params('num_output',lsplit)
 
-		if params['type'] == 'DROPOUT':
+		elif params['type'] == 'DROPOUT':
 			params['dropout_ratio'] = find_params('dropout_ratio',lsplit)
-		if params['type'] == 'POOLING':
+		elif params['type'] == 'POOLING':
 			params['pool'] = find_params('pool',lsplit)
 			params['kernel_size'] = find_params('kernel_size',lsplit)
 			params['stride'] = find_params('stride',lsplit)
+
+		elif params['type'] == 'LRN':
+			params['local_size'] = find_params('local_size', lsplit, default=5)
+			params['alpha'] = find_params('alpha', lsplit, default=1)
+			params['beta'] = find_params('beta', lsplit, default=5)
+
+		else:
+			raise Exception ("no type %s" % params['type'])
+
 
 		layers.append(params)
 
 	return input_dims, layers
 
 
-def find_params(string, lsplit):
+def find_params(string, lsplit, default='DEFAULT'):
 	try:
 		idx = lsplit.index(string+':')
 		return lsplit[idx+1].rstrip('"').lstrip('"')
 	except:
-		return 'DEFAULT'
+		return default
 
 if __name__ == '__main__':
 	split = parse_model_def('VGG_ILSVRC_16_layers_deploy.prototxt')

@@ -126,9 +126,13 @@ def parse_layer(layer, last_layer):
 		return dropout_layer_from_params(layer, last_layer)
 	elif layer['type'] == 'SOFTMAX':
 		return softmax_layer_from_params(layer, last_layer)
+	elif layer['type'] == 'LRN':
+		return lrn_layer_from_params(layer, last_layer)
 	else:
 		print 'not a valid layer: %s' % layer['type']
 
+def lrn_layer_from_params(layer, last_layer):
+	lrn = layers.esponseNormalisationLayer(last_layer, int(layer['local_size']), 1, float(layer['alpha']), float(layer['beta']))
 def cuda_conv_layer_from_params(layer, last_layer):
 	''' CAN'T DO ANYTHING BUT (1,1) STRIDES RIGHT NOW! '''
 	if layer['stride'] == 'DEFAULT':
