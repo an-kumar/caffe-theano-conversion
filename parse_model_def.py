@@ -10,12 +10,16 @@ def parse_model_def(prototxt_path):
 		split = full.split('layer')
 	
 	# get input dimension
-	input_splits = split[1].split()
+	if split[1].split()[0] == '{':
+		input_splits = split[0].split()
+	else:
+		input_splits = split[1].split()
 	input_dims = []
 	last_idx=0
 	while(True):
 		try:
 			idx = input_splits.index('input_dim:', last_idx+1)
+			print input_splits
 			input_dims.append(int(input_splits[idx+1]))
 			last_idx=idx
 		except:

@@ -41,7 +41,11 @@ def convert(prototxt, caffemodel):
 			last_layer = reshape_layer
 			swapped = True
 		this_layer = parse_layer(layer, last_layer)
-		set_params(this_layer, net, layer)
+		try:
+			set_params(this_layer, net, layer)
+		except:
+			print layer
+			raise
 		last_layer = this_layer
 		all_layers.append(this_layer)
 
@@ -108,23 +112,23 @@ def parse_layer(layer, last_layer):
 	'''
 	returns the correct layer given the param dict
 	'''
-	if layer['type'] == 'CONVOLUTION':
+	if layer['type'] == 'CONVOLUTION' or layer['type'] == 'Convolution':
 		if cuda==True:
 			return cuda_conv_layer_from_params(layer, last_layer)
 		else:
 			return conv_layer_from_params(layer, last_layer)
 	elif layer['type'] == 'RELU' or layer['type'] == 'ReLU':
 		return relu_layer_from_params(layer, last_layer)
-	elif layer['type'] == 'POOLING':
+	elif layer['type'] == 'POOLING' or layer['type'] == 'Pooling':
 		if cuda==True:
 			return cuda_pooling_layer_from_params(layer, last_layer)
 		else:
 			return pooling_layer_from_params(layer, last_layer)
-	elif layer['type'] == 'INNER_PRODUCT':
+	elif layer['type'] == 'INNER_PRODUCT' or layer['type'] == 'InnerProduct':
 		return ip_layer_from_params(layer, last_layer)
-	elif layer['type'] == 'DROPOUT':
+	elif layer['type'] == 'DROPOUT' or layer['type'] == 'Dropout':
 		return dropout_layer_from_params(layer, last_layer)
-	elif layer['type'] == 'SOFTMAX':
+	elif layer['type'] == 'SOFTMAX' or layer['type'] == 'Softmax':
 		return softmax_layer_from_params(layer, last_layer)
 	elif layer['type'] == 'LRN':
 		return lrn_layer_from_params(layer, last_layer)
@@ -132,7 +136,9 @@ def parse_layer(layer, last_layer):
 		print 'not a valid layer: %s' % layer['type']
 
 def lrn_layer_from_params(layer, last_layer):
-	lrn = layers.esponseNormalisationLayer(last_layer, int(layer['local_size']), 1, float(layer['alpha']), float(layer['beta']))
+	lrn = layers.ResponseNormalisationLayer(last_layer, int(layer['local_size']), 1, float(layer['alpha']), float(layer['beta']))
+	print lrn
+	return lrn
 def cuda_conv_layer_from_params(layer, last_layer):
 	''' CAN'T DO ANYTHING BUT (1,1) STRIDES RIGHT NOW! '''
 	if layer['stride'] == 'DEFAULT':
