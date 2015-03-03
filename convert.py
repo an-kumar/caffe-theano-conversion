@@ -92,9 +92,15 @@ def parse_layer(layer, last_layer):
 
 
 def conv_layer_from_params(layer, last_layer):
+	''' CAN'T DO ANYTHING BUT (1,1) STRIDES RIGHT NOW! '''
 	if layer['stride'] == 'DEFAULT':
 		layer['stride'] = 1
-	conv = layers.Conv2DLayer(last_layer, int(layer['num_output']), int(layer['kernel_size']), int(layer['kernel_size']), -1, -1, stride=layer['stride'], nonlinearity=layers.identity, pad=int(layer['pad']))
+	if layer['kernel_size'] - (layer['pad'] * 2 ) == 1:
+		print "using same convolutions, this should be correct"
+	else:
+		print "this will be incorrect. the caffe net is not using same convolutions (i think). you should check what their doing, go into layers.py and fix this accordingly"
+		raise Exception ("this will probably not work but try to comment this out if oyu want")
+	conv = layers.Conv2DLayer(last_layer, int(layer['num_output']), int(layer['kernel_size']), int(layer['kernel_size']), -1, -1, nonlinearity=layers.identity, border_mode='same')
 	return conv
 
 def relu_layer_from_params(layer, last_layer):
