@@ -238,7 +238,7 @@ def shared_single(dim=2):
     Shortcut to create an undefined single precision Theano shared variable.
     """
     shp = tuple([1] * dim)
-    return theano.shared(np.zeros(shp, dtype='float32'))
+    return theano.shared(np.zeros(shp, dtype=theano.config.floatX))
 
 
 
@@ -281,7 +281,7 @@ class Input2DLayer(object):
         self.n_features = n_features
         self.width = width
         self.height = height
-        self.input_var = T.tensor4('input', dtype='float32')
+        self.input_var = T.tensor4('input', dtype=theano.config.floatX)
 
     def get_output_shape(self):
         return (self.mb_size, self.n_features, self.width, self.height)
@@ -403,7 +403,7 @@ class DenseLayer(object):
 
         if dropout_active and (self.dropout > 0.):
             retain_prob = 1 - self.dropout
-            input = input / retain_prob * srng.binomial(input.shape, p=retain_prob, dtype='int32').astype('float32')
+            input = input / retain_prob * srng.binomial(input.shape, p=retain_prob, dtype='int32').astype(theano.config.floatX)
             # apply the input mask and rescale the input accordingly. By doing this it's no longer necessary to rescale the weights at test time.
 
         return self.nonlinearity(T.dot(input, self.W) + self.b.dimshuffle('x', 0))
@@ -594,7 +594,7 @@ class StridedConvLayer(object):
     #     input = self.input_layer.dropoutput_train()
     #     if p > 0.:
     #         srng = RandomStreams()
-    #         input = input * srng.binomial(self.input_layer.get_output_shape(), p=1 - p, dtype='int32').astype('float32')
+    #         input = input * srng.binomial(self.input_layer.get_output_shape(), p=1 - p, dtype='int32').astype(theano.config.floatX)
     #     return self.output(input)
 
     # def dropoutput_predict(self):
@@ -659,9 +659,9 @@ class Conv2DLayer(object):
             retain_prob = 1 - self.dropout
             if self.dropout_tied:
                 # tying of the dropout masks across the entire feature maps, so broadcast across the feature maps.
-                mask = srng.binomial((input.shape[0], input.shape[1]), p=retain_prob, dtype='int32').astype('float32').dimshuffle(0, 1, 'x', 'x')
+                mask = srng.binomial((input.shape[0], input.shape[1]), p=retain_prob, dtype='int32').astype(theano.config.floatX).dimshuffle(0, 1, 'x', 'x')
             else:
-                mask = srng.binomial(input.shape, p=retain_prob, dtype='int32').astype('float32')
+                mask = srng.binomial(input.shape, p=retain_prob, dtype='int32').astype(theano.config.floatX)
                 # apply the input mask and rescale the input accordingly. By doing this it's no longer necessary to rescale the weights at test time.
             input = input / retain_prob * mask
 
@@ -709,7 +709,7 @@ class MaxoutLayer(object):
 
         if dropout_active and (self.dropout > 0.):
             retain_prob = 1 - self.dropout
-            input = input / retain_prob * srng.binomial(input.shape, p=retain_prob, dtype='int32').astype('float32')
+            input = input / retain_prob * srng.binomial(input.shape, p=retain_prob, dtype='int32').astype(theano.config.floatX)
             # apply the input mask and rescale the input accordingly. By doing this it's no longer necessary to rescale the weights at test time.
 
         output = input.reshape((self.input_shape[0], self.input_shape[1] / self.n_filters_per_unit, self.n_filters_per_unit, self.input_shape[2]))
@@ -756,9 +756,9 @@ class NIN2DLayer(object):
             if self.dropout_tied:
                 # tying of the dropout masks across the entire feature maps, so broadcast across the feature maps.
 
-                 mask = srng.binomial((input.shape[0], input.shape[1]), p=retain_prob, dtype='int32').astype('float32').dimshuffle(0, 1, 'x', 'x')
+                 mask = srng.binomial((input.shape[0], input.shape[1]), p=retain_prob, dtype='int32').astype(theano.config.floatX).dimshuffle(0, 1, 'x', 'x')
             else:
-                mask = srng.binomial(input.shape, p=retain_prob, dtype='int32').astype('float32')
+                mask = srng.binomial(input.shape, p=retain_prob, dtype='int32').astype(theano.config.floatX)
                 # apply the input mask and rescale the input accordingly. By doing this it's no longer necessary to rescale the weights at test time.
             input = input / retain_prob * mask
 
@@ -799,7 +799,7 @@ class FilterPoolingLayer(object):
 
         if dropout_active and (self.dropout > 0.):
             retain_prob = 1 - self.dropout
-            input = input / retain_prob * srng.binomial(input.shape, p=retain_prob, dtype='int32').astype('float32')
+            input = input / retain_prob * srng.binomial(input.shape, p=retain_prob, dtype='int32').astype(theano.config.floatX)
             # apply the input mask and rescale the input accordingly. By doing this it's no longer necessary to rescale the weights at test time.
 
         output = input.reshape((self.input_shape[0], self.input_shape[1] / self.n_filters_per_unit, self.n_filters_per_unit, self.input_shape[2]))
@@ -1041,9 +1041,9 @@ class StridedConv2DLayer(object):
             retain_prob = 1 - self.dropout
             if self.dropout_tied:
                 # tying of the dropout masks across the entire feature maps, so broadcast across the feature maps.
-                mask = srng.binomial((input.shape[0], input.shape[1]), p=retain_prob, dtype='int32').astype('float32').dimshuffle(0, 1, 'x', 'x')
+                mask = srng.binomial((input.shape[0], input.shape[1]), p=retain_prob, dtype='int32').astype(theano.config.floatX).dimshuffle(0, 1, 'x', 'x')
             else:
-                mask = srng.binomial(input.shape, p=retain_prob, dtype='int32').astype('float32')
+                mask = srng.binomial(input.shape, p=retain_prob, dtype='int32').astype(theano.config.floatX)
                 # apply the input mask and rescale the input accordingly. By doing this it's no longer necessary to rescale the weights at test time.
             input = input / retain_prob * mask
 
@@ -1328,7 +1328,7 @@ def sparse_initialisation(n_inputs, n_outputs, sparsity=0.05, std=0.01):
     """
     sparsity: fraction of the weights to each output unit that should be nonzero
     """
-    weights = np.zeros((n_inputs, n_outputs), dtype='float32')
+    weights = np.zeros((n_inputs, n_outputs), dtype=theano.config.floatX)
     size = int(sparsity * n_inputs)
     for k in xrange(n_outputs):
         indices = np.arange(n_inputs)

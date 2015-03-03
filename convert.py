@@ -30,10 +30,10 @@ def convert(prototxt, caffemodel):
 		last_layer = this_layer
 		all_layers.append(this_layer)
 
-	X = T.tensor4('data', dtype='float32') # This will be the data we pass in; we could change this to an index into a batch for example, this is just for testing how this conversion script works
+	X = T.tensor4('data', dtype=theano.config.floatX) # This will be the data we pass in; we could change this to an index into a batch for example, this is just for testing how this conversion script works
 	givens = {inp_layer.input_var:X}
 	forward = theano.function([X], [layer.output(dropout_active=False) for layer in all_layers],givens=givens)
-	return forward, net
+	return forward, net, all_layers
 
 
 
@@ -59,8 +59,8 @@ def set_conv_params(theano_layer, net, layer_params):
 	b = net.params[name][1].data
 	# b needs to just be the last index
 	b = b[0,0,0,:]
-	theano_layer.W.set_value(W.astype(np.float32))
-	theano_layer.b.set_value(b.astype(np.float32))
+	theano_layer.W.set_value(W.astype(theano.config.floatX))
+	theano_layer.b.set_value(b.astype(theano.config.floatX))
 
 def set_ip_params(theano_layer, net, layer_params):
 	name = layer_params['name']
@@ -71,8 +71,8 @@ def set_ip_params(theano_layer, net, layer_params):
 	W = W[0,0,:,:].T
 	# b needs to just be the last index
 	b = b[0,0,0,:]
-	theano_layer.W.set_value(W.astype(np.float32))
-	theano_layer.b.set_value(b.astype(np.float32))
+	theano_layer.W.set_value(W.astype(theano.config.floatX))
+	theano_layer.b.set_value(b.astype(theano.config.floatX))
 
 
 def parse_layer(layer, last_layer):
