@@ -110,7 +110,7 @@ def relu_layer_from_params(layer, last_layer):
 def pooling_layer_from_params(layer, last_layer):
 	if layer['stride'] == 'DEFAULT':
 		layer['stride'] = 1
-	pool = layers.Pooling2DLayer(last_layer, (int(layer['kernel_size'], int(layer['kernel_size']))))
+	pool = layers.Pooling2DLayer(last_layer, (int(layer['kernel_size']), int(layer['kernel_size'])))
 	return pool
 
 def ip_layer_from_params(layer, last_layer):
