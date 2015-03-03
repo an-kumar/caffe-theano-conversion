@@ -31,7 +31,7 @@ def convert(prototxt, caffemodel):
 		last_layer = inp_layer = cc_layers.CudaConvnetInput2DLayer(1, input_dims[1], input_dims[2], input_dims[3])
 
 	# go thru layers and create the theano layer 
-	all_layers = []
+	all_layers = [inp_layer]
 	swapped = False
 	print architecture[0]
 	for layer in architecture:
