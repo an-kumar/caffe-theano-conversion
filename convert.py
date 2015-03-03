@@ -25,7 +25,10 @@ def convert(prototxt, caffemodel):
 
 	# create input layer
 	# this actually ends up being c01b shaped, but we pass in bc01
-	last_layer = inp_layer = layers.Input2DLayer(input_dims[0], input_dims[1], input_dims[2], input_dims[3])
+	if cuda == True:
+		last_layer = inp_layer = layers.Input2DLayer(input_dims[0], input_dims[1], input_dims[2], input_dims[3])
+	else:
+		last_layer = inp_layer = cc_layers.CudaConvnetInput2DLayer(input_dims[0], input_dims[1], input_dims[2], input_dims[3])
 
 	# go thru layers and create the theano layer 
 	all_layers = []
