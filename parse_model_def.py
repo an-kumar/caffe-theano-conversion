@@ -33,18 +33,18 @@ def parse_model_def(prototxt_path):
 		params['name'] = find_params('name',lsplit)
 		params['type'] = find_params('type',lsplit)
 
-		if params['type'] == 'CONVOLUTION':
+		if params['type'] == 'CONVOLUTION' or params['type']=='Convolution':
 			params['num_output'] = find_params('num_output', lsplit)
 			params['pad'] = find_params('pad',lsplit)
 			params['stride'] = find_params('stride',lsplit)
 			params['kernel_size'] = find_params('kernel_size',lsplit)
 
-		elif params['type'] == 'INNER_PRODUCT':
+		elif params['type'] == 'INNER_PRODUCT' or params['type'] == 'InnerProduct':
 			params['num_output'] = find_params('num_output',lsplit)
 
-		elif params['type'] == 'DROPOUT':
+		elif params['type'] == 'DROPOUT' or params['type'] == 'Dropout':
 			params['dropout_ratio'] = find_params('dropout_ratio',lsplit)
-		elif params['type'] == 'POOLING':
+		elif params['type'] == 'POOLING' or params['type'] == 'Pooling':
 			params['pool'] = find_params('pool',lsplit)
 			params['kernel_size'] = find_params('kernel_size',lsplit)
 			params['stride'] = find_params('stride',lsplit)
