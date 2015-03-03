@@ -6,6 +6,8 @@ def parse_model_def(prototxt_path):
 
 	# split on "layers"
 	split = full.split('layers')
+	if len(split) ==1:
+		split = full.split('layer')
 	
 	# get input dimension
 	input_splits = split[1].split()
