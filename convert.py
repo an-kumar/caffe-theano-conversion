@@ -181,7 +181,7 @@ def cuda_pooling_layer_from_params(layer, last_layer):
 	return pool
 
 def ip_layer_from_params(layer, last_layer):
-	dense = layers.DenseLayer(last_layer, int(layer['num_output']), -1, -1, nonlinearity=layers.identity) #dropout default 0
+	dense = layers.DenseCaffeLayer(last_layer, int(layer['num_output']), -1, -1, nonlinearity=layers.identity) #dropout default 0
 	return dense
 
 def dropout_layer_from_params(layer, last_layer):
