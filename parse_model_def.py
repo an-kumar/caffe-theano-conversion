@@ -50,9 +50,6 @@ def parse_model_def(prototxt_path):
 			params['alpha'] = find_params('alpha', lsplit, default=1)
 			params['beta'] = find_params('beta', lsplit, default=5)
 
-		else:
-			raise Exception ("no type %s" % params['type'])
-
 
 		layers.append(params)
 
