@@ -113,7 +113,7 @@ def parse_layer(layer, last_layer):
 			return cuda_conv_layer_from_params(layer, last_layer)
 		else:
 			return conv_layer_from_params(layer, last_layer)
-	elif layer['type'] == 'RELU':
+	elif layer['type'] == 'RELU' or layer['type'] == 'ReLU':
 		return relu_layer_from_params(layer, last_layer)
 	elif layer['type'] == 'POOLING':
 		if cuda==True:
