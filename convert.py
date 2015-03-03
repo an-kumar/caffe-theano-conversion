@@ -56,8 +56,8 @@ def set_conv_params(theano_layer, net, layer_params):
 	b = net.params[name][1].data
 	# b needs to just be the last index
 	b = b[0,0,0,:]
-	theano_layer.W.set_value(W)
-	theano_layer.b.set_value(b)
+	theano_layer.W.set_value(W.astype(np.float32))
+	theano_layer.b.set_value(b.astype(np.float32))
 
 def set_ip_params(theano_layer, net, layer_params):
 	name = layer_params['name']
@@ -68,8 +68,8 @@ def set_ip_params(theano_layer, net, layer_params):
 	W = W[0,0,:,:].T
 	# b needs to just be the last index
 	b = b[0,0,0,:]
-	theano_layer.W.set_value(W)
-	theano_layer.b.set_value(b)
+	theano_layer.W.set_value(W.astype(np.float32))
+	theano_layer.b.set_value(b.astype(np.float32))
 
 
 def parse_layer(layer, last_layer):
