@@ -1,7 +1,12 @@
 import theano
 import numpy as np
 import theano.tensor as T
-#import cc_layers
+try:
+	import cc_layers
+	cuda = True
+except:
+	print "probably no pylearn2; using normal"
+	cuda = False
 import layers
 from parse_model_def import parse_model_def as parse
 import caffe
@@ -24,7 +29,14 @@ def convert(prototxt, caffemodel):
 
 	# go thru layers and create the theano layer 
 	all_layers = []
+	swapped = False
 	for layer in architecture:
+		if layer['type'] == 'INNER_PRODUCT' and swapped==False and cuda==True:
+			# need to add a reshaping layer
+			reshape_layer = cc_layers.ShuffleC01BToBC01Layer(last_layer)
+			all_layers.append(reshape_layer)
+			last_layer = reshape_layer
+			swapped = True
 		this_layer = parse_layer(layer, last_layer)
 		set_params(this_layer, net, layer)
 		last_layer = this_layer
@@ -47,7 +59,10 @@ def set_params(theano_layer, net, layer_params):
 		return # no params to set
 	else:
 		if layer_params['type'] == 'CONVOLUTION':
-			set_conv_params(theano_layer, net, layer_params)
+			if cuda==True:
+				set_cuda_conv_params(theano_layer, net, layer_params)
+			else:
+				set_conv_params(theano_layer, net, layer_params)
 		elif layer_params['type'] == 'INNER_PRODUCT':
 			set_ip_params(theano_layer, net, layer_params)
 		else:
@@ -59,6 +74,17 @@ def set_conv_params(theano_layer, net, layer_params):
 	b = net.params[name][1].data
 	# b needs to just be the last index
 	b = b[0,0,0,:]
+	theano_layer.W.set_value(W.astype(theano.config.floatX))
+	theano_layer.b.set_value(b.astype(theano.config.floatX))
+
+def set_cuda_conv_params(theano_layer, net, layer_params):
+	name = layer_params['name']
+	W = net.params[name][0].data
+	b = net.params[name][1].data
+	# b needs to just be the last index
+	b = b[0,0,0,:]
+	# W needs to be reshaped into n_features(from prev layer), size, size, n_filters
+	W = W.transpose(3,0,1,2)
 	theano_layer.W.set_value(W.astype(theano.config.floatX))
 	theano_layer.b.set_value(b.astype(theano.config.floatX))
 
@@ -80,11 +106,17 @@ def parse_layer(layer, last_layer):
 	returns the correct layer given the param dict
 	'''
 	if layer['type'] == 'CONVOLUTION':
-		return conv_layer_from_params(layer, last_layer)
+		if cuda==True:
+			return cuda_conv_layer_from_params(layer, last_layer)
+		else:
+			return conv_layer_from_params(layer, last_layer)
 	elif layer['type'] == 'RELU':
 		return relu_layer_from_params(layer, last_layer)
 	elif layer['type'] == 'POOLING':
-		return pooling_layer_from_params(layer, last_layer)
+		if cuda==True:
+			return cuda_pooling_layer_from_params(layer, last_layer)
+		else:
+			return pooling_layer_from_params(layer, last_layer)
 	elif layer['type'] == 'INNER_PRODUCT':
 		return ip_layer_from_params(layer, last_layer)
 	elif layer['type'] == 'DROPOUT':
@@ -94,6 +126,17 @@ def parse_layer(layer, last_layer):
 	else:
 		print 'not a valid layer: %s' % layer['type']
 
+def cuda_conv_layer_from_params(layer, last_layer):
+	''' CAN'T DO ANYTHING BUT (1,1) STRIDES RIGHT NOW! '''
+	if layer['stride'] == 'DEFAULT':
+		layer['stride'] = 1
+	if int(layer['kernel_size']) - (int(layer['pad']) * 2 ) == 1:
+		print "using same convolutions, this should be correct"
+	else:
+		print "this will be incorrect. the caffe net is not using same convolutions (i think). you should check what their doing, go into layers.py and fix this accordingly"
+		raise Exception ("this will probably not work but try to comment this out if oyu want")
+	conv = cc_layers.CudaConvnetConv2DLayer(last_layer, int(layer['num_output']), int(layer['kernel_size']), -1, -1, nonlinearity=layers.identity, pad=int(layer['pad']))
+	return conv
 
 def conv_layer_from_params(layer, last_layer):
 	''' CAN'T DO ANYTHING BUT (1,1) STRIDES RIGHT NOW! '''
@@ -114,6 +157,13 @@ def pooling_layer_from_params(layer, last_layer):
 	if layer['stride'] == 'DEFAULT':
 		layer['stride'] = 1
 	pool = layers.Pooling2DLayer(last_layer, (int(layer['kernel_size']), int(layer['kernel_size'])))
+	return pool
+
+def cuda_pooling_layer_from_params(layer, last_layer):
+	if layer['stride'] == 'DEFAULT':
+		layer['stride'] = 1
+		print "this is a problem."
+	pool = cc_layers.Pooling2DLayer(last_layer, pool_size=(int(layer['kernel_size']), stride=layer['stride'])
 	return pool
 
 def ip_layer_from_params(layer, last_layer):
