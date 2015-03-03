@@ -325,7 +325,8 @@ class Pooling2DLayer(object):
         self.mb_size = self.input_layer.mb_size
 
     def get_output_shape(self):
-        output_shape = list(self.input_layer.get_output_shape()) # convert to list because we cannot assign to a tuple element
+        output_shape = list(self.input_layer.get_output_shape())
+        print output_shape # convert to list because we cannot assign to a tuple element
         if self.ignore_border:
             output_shape[-2] = int(np.floor(float(output_shape[-2]) / self.pool_size[0]))
             output_shape[-1] = int(np.floor(float(output_shape[-1]) / self.pool_size[1]))
