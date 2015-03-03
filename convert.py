@@ -87,7 +87,7 @@ def set_cuda_conv_params(theano_layer, net, layer_params):
 	# b needs to just be the last index
 	b = b[0,0,0,:]
 	# W needs to be reshaped into n_features(from prev layer), size, size, n_filters
-	W = W.transpose(3,0,1,2)
+	W = W.transpose(1,2,3,0)
 	theano_layer.W.set_value(W.astype(theano.config.floatX))
 	theano_layer.b.set_value(b.astype(theano.config.floatX))
 
