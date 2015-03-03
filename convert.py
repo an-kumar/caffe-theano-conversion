@@ -1,6 +1,6 @@
 import theano
 import theano.tensor as T
-import cc_layers
+#import cc_layers
 import layers
 from parse_model_def import parse_model_def as parse
 import caffe
@@ -13,21 +13,22 @@ def convert(prototxt, caffemodel):
 	returns a function "forward", that's all. of course this code can be changed to do a lot of things.
 	'''
 	# parse the prototxt file
-	input_dims, layers = parse(prototxt)
+	input_dims, architecture = parse(prototxt)
 	assert len(input_dims) == 4 #bc01
+	net = caffe.Net(prototxt, caffemodel, caffe.TEST)
 
 	# create input layer
 	# this actually ends up being c01b shaped, but we pass in bc01
-	last_layer = inp_layer = cc_layers.CudaConvnetInput2DLayer(input_dims[0], input_dims[1], input_dims[2], input_dims[3])
+	last_layer = inp_layer = layers.Input2DLayer(input_dims[0], input_dims[1], input_dims[2], input_dims[3])
 
 	# go thru layers and create the theano layer 
-	for layer in layers:
+	for layer in architecture:
 		this_layer = parse_layer(layer, last_layer)
 		set_params(this_layer, net, layer)
 		last_layer = this_layer
 
 	X = T.tensor4('data') # This will be the data we pass in; we could change this to an index into a batch for example, this is just for testing how this conversion script works
-	givens = {inp_layer.input_var=X}
+	givens = {inp_layer.input_var:X}
 	forward = theano.function([X], last_layer.output(dropout_active=False),givens=givens)
 	return forward
 
@@ -126,3 +127,5 @@ def dropout_layer_from_params(layer, last_layer):
 def softmax_layer_from_params(layer, last_layer):
 	return layers.SoftmaxLayer(last_layer)
 
+if __name__ == '__main__':
+	forward = convert('VGG_ILSVRC_16_layers_deploy.prototxt', 'VGG_ILSVRC_16_layers.caffemodel')
