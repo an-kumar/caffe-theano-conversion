@@ -33,8 +33,9 @@ def convert(prototxt, caffemodel):
 	# go thru layers and create the theano layer 
 	all_layers = []
 	swapped = False
+	print architecture[0]
 	for layer in architecture:
-		if layer['type'] == 'INNER_PRODUCT' and swapped==False and cuda==True:
+		if (layer['type'] == 'INNER_PRODUCT' or layer['type'] == 'InnerProduct') and swapped==False and cuda==True:
 			# need to add a reshaping layer
 			reshape_layer = cc_layers.ShuffleC01BToBC01Layer(last_layer)
 			all_layers.append(reshape_layer)
@@ -43,11 +44,8 @@ def convert(prototxt, caffemodel):
 		this_layer = parse_layer(layer, last_layer)
 		if this_layer == -1:
 			continue
-		try:
-			set_params(this_layer, net, layer)
-		except:
-			print layer
-			raise
+		
+		set_params(this_layer, net, layer)
 		last_layer = this_layer
 		all_layers.append(this_layer)
 
