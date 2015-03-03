@@ -12,8 +12,10 @@ def parse_model_def(prototxt_path):
 	# get input dimension
 	if split[1].split()[0] == '{':
 		input_splits = split[0].split()
+		start = 0
 	else:
 		input_splits = split[1].split()
+		start = 1
 	input_dims = []
 	last_idx=0
 	while(True):
@@ -27,7 +29,7 @@ def parse_model_def(prototxt_path):
 
 	# now go thru layers
 	layers= []
-	for layer_string in split[2:]:
+	for layer_string in split[start+1:]:
 		lsplit = layer_string.split()
 		params = {}
 		params['name'] = find_params('name',lsplit)
