@@ -188,4 +188,4 @@ def softmax_layer_from_params(layer, last_layer):
 	return layers.SoftmaxLayer(last_layer)
 
 if __name__ == '__main__':
-	forward, net, all_layers = convert('/root/caffe/models/bvlc_reference_rcnn_ilsvrc13/deploy.prototxt','/root/caffe/models/bvlc_reference_rcnn_ilsvrc13/bvlc_reference_rcnn_ilsvrc13.caffemodel)
+	forward, net, all_layers = convert('/root/caffe/models/bvlc_reference_rcnn_ilsvrc13/deploy.prototxt','/root/caffe/models/bvlc_reference_rcnn_ilsvrc13/bvlc_reference_rcnn_ilsvrc13.caffemodel')
