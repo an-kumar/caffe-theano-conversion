@@ -281,7 +281,7 @@ class Input2DLayer(object):
         self.n_features = n_features
         self.width = width
         self.height = height
-        self.input_var = T.tensor4('input')
+        self.input_var = T.tensor4('input', dtype='float32')
 
     def get_output_shape(self):
         return (self.mb_size, self.n_features, self.width, self.height)

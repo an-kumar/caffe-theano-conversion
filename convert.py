@@ -1,4 +1,5 @@
 import theano
+import numpy as np
 import theano.tensor as T
 #import cc_layers
 import layers
@@ -27,7 +28,7 @@ def convert(prototxt, caffemodel):
 		set_params(this_layer, net, layer)
 		last_layer = this_layer
 
-	X = T.tensor4('data') # This will be the data we pass in; we could change this to an index into a batch for example, this is just for testing how this conversion script works
+	X = T.tensor4('data', dtype='float32') # This will be the data we pass in; we could change this to an index into a batch for example, this is just for testing how this conversion script works
 	givens = {inp_layer.input_var:X}
 	forward = theano.function([X], last_layer.output(dropout_active=False),givens=givens)
 	return forward
