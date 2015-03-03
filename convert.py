@@ -41,6 +41,8 @@ def convert(prototxt, caffemodel):
 			last_layer = reshape_layer
 			swapped = True
 		this_layer = parse_layer(layer, last_layer)
+		if this_layer == -1:
+			continue
 		try:
 			set_params(this_layer, net, layer)
 		except:
@@ -65,12 +67,12 @@ def set_params(theano_layer, net, layer_params):
 	if len(theano_layer.params)== 0:
 		return # no params to set
 	else:
-		if layer_params['type'] == 'CONVOLUTION':
+		if layer_params['type'] == 'CONVOLUTION' or layer_params['type'] == 'Convolution':
 			if cuda==True:
 				set_cuda_conv_params(theano_layer, net, layer_params)
 			else:
 				set_conv_params(theano_layer, net, layer_params)
-		elif layer_params['type'] == 'INNER_PRODUCT':
+		elif layer_params['type'] == 'INNER_PRODUCT' or layer_params['type'] == 'InnerProduct':
 			set_ip_params(theano_layer, net, layer_params)
 		else:
 			print "not a valid layer to set params to (what happened??) %s" % layer_params['type']
@@ -134,6 +136,7 @@ def parse_layer(layer, last_layer):
 		return lrn_layer_from_params(layer, last_layer)
 	else:
 		print 'not a valid layer: %s' % layer['type']
+		return -1
 
 def lrn_layer_from_params(layer, last_layer):
 	lrn = layers.ResponseNormalisationLayer(last_layer, int(layer['local_size']), 1, float(layer['alpha']), float(layer['beta']))
