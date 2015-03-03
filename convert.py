@@ -163,7 +163,7 @@ def cuda_pooling_layer_from_params(layer, last_layer):
 	if layer['stride'] == 'DEFAULT':
 		layer['stride'] = 1
 		print "this is a problem."
-	pool = cc_layers.Pooling2DLayer(last_layer, pool_size=int(layer['kernel_size']), stride=layer['stride'])
+	pool = cc_layers.CudaConvnetPooling2DLayer(last_layer, pool_size=int(layer['kernel_size']), stride=layer['stride'])
 	return pool
 
 def ip_layer_from_params(layer, last_layer):
