@@ -38,7 +38,7 @@ class CaffeDenseLayer(layers.Layer):
 	def __init__(self, incoming, num_units, W=init.Uniform(),
 	             b=init.Constant(0.), nonlinearity=nonlinearities.rectify,
 	             **kwargs):
-	    super(DenseLayer, self).__init__(incoming, **kwargs)
+	    super(CaffeDenseLayer, self).__init__(incoming, **kwargs)
 	    if nonlinearity is None:
 	        self.nonlinearity = nonlinearities.identity
 	    else:
