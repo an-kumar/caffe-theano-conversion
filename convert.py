@@ -188,7 +188,7 @@ def conv_layer_from_params(layer, last_layer):
 	border_mode = 'same'
 	nonlinearity=nonlinearities.identity
 
-	conv = layers.Conv2DLayer(last_layer, num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, linearity=nonlinearity)
+	conv = layers.Conv2DLayer(last_layer, num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity)
 	return conv
 
 def relu_layer_from_params(layer, last_layer):
