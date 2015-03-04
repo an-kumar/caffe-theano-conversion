@@ -18,9 +18,8 @@ class CaffeConv2DLayer(layers.Conv2DLayer):
 
     def get_W_shape(self):
         num_input_channels = self.input_shape[1]
-        print self.input_shape
         assert num_input_channels % self.group == 0
-        return (self.num_filters, num_input_channels/self.group, self.filter_size[0], self.filter_size[1])
+        return (self.num_filters/self.group, num_input_channels/self.group, self.filter_size[0], self.filter_size[1])
 
     def get_output_for(self, input, input_shape=None, *args, **kwargs):
         # the optional input_shape argument is for when get_output_for is
@@ -43,13 +42,12 @@ class CaffeConv2DLayer(layers.Conv2DLayer):
         elif self.border_mode == 'same':
             tensors=[]
             for g in range(self.group):
-                print 
                 inp = input[:,g*(filter_shape[1]/self.group):(g+1)*(filter_shape[1]/self.group),:,:]
                 tensors.append(self.convolution(inp, self.W[self.num_filters/2,:,:,:], subsample=self.strides,
                                       image_shape=input_shape,
                                       filter_shape=filter_shape,
                                       border_mode=self.border_mode))
-            conved = T.concatenate(tensors, axis=0)
+            conved = T.concatenate(tensors, axis=1)
             shift_x = (self.filter_size[0] - 1) // 2
             shift_y = (self.filter_size[1] - 1) // 2
             conved = conved[:, :, shift_x:input_shape[2] + shift_x,
