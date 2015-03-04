@@ -194,7 +194,7 @@ def conv_layer_from_params(layer, last_layer):
 	nonlinearity=nonlinearities.identity
 
 	if group > 1:
-		conv = extra_layers.CaffeConv2dLayer(last_layer, group=group,num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity)
+		conv = extra_layers.CaffeConv2DLayer(last_layer, group=group,num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity)
 	else:
 		conv = layers.Conv2DLayer(last_layer, num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity)
 	return conv
