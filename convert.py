@@ -188,7 +188,7 @@ def conv_layer_from_params(layer, last_layer):
 	num_filters = int(layer['num_output'])
 	filter_size = (int(layer['kernel_size']), int(layer['kernel_size'])) # must be a tuple
 	strides = (int(layer['stride']),int(layer['stride'])) # can only suport square strides anyways
-	group = int(layer['stride'])
+	group = int(layer['group'])
 	## border mode is wierd...
 	
 	nonlinearity=nonlinearities.identity
