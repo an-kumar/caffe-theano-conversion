@@ -235,7 +235,7 @@ def softmax_layer_from_params(layer, last_layer):
 
 def test_similarity(model, net):
 	random_mat = np.random.randn(10,3,224,224) #hard coded for VGG ILSVRC 15
-	fprop = net.forward(**{net.input[0] = random_mat})
+	fprop = net.forward(**{net.input[0]:random_mat})
 	outlist = model.forward(random_mat)
 
 	# print fprop vs outlist
