@@ -18,6 +18,7 @@ class CaffeConv2DLayer(layers.Conv2DLayer):
 
     def get_W_shape(self):
         num_input_channels = self.input_shape[1]
+        print self.input_shape
         assert num_input_channels % self.group == 0
         return (self.num_filters, num_input_channels/self.group, self.filter_size[0], self.filter_size[1])
 
