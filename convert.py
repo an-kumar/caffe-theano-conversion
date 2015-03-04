@@ -185,10 +185,10 @@ def conv_layer_from_params(layer, last_layer):
 	filter_size = int(layer['kernel_size'])
 	strides = (int(layer['stride']),int(layer['stride'])) # can only suport square strides anyways
 	## border mode is wierd...
-	border_mode = same
+	border_mode = 'same'
 	nonlinearity=nonlinearities.identity
 
-	conv = layers.Conv2DLayer(last_layer, num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode='same', linearity=nonlinearity)
+	conv = layers.Conv2DLayer(last_layer, num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, linearity=nonlinearity)
 	return conv
 
 def relu_layer_from_params(layer, last_layer):
@@ -227,4 +227,4 @@ def softmax_layer_from_params(layer, last_layer):
 	return extra_layers.SoftmaxLayer(last_layer)
 
 if __name__ == '__main__':
-	forward, net, all_layers = convert('VGG_ILSVRC_16_layers_deploy.prototxt','VGG_ILSVRC_16_layers.caffemodel')
+	forward, net, all_layers = convert('VGG_ILSVRC_16_layers_deploy.prototxt','VGG_ILSVRC_16_layers.caffemodelf')
