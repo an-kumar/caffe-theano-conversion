@@ -7,7 +7,7 @@ import theano
 import theano.tensor as T
 from theano.tensor.signal import downsample
 
-from lasagne import cuda_convnet
+from lasagne.layers import cuda_convnet
 
 
 import lasagne.layers as layers
