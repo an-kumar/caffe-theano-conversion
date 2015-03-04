@@ -72,44 +72,44 @@ A fully connected layer.
     >>> l_in = InputLayer((100, 20))
     >>> l1 = DenseLayer(l_in, num_units=50)
 """
-def __init__(self, incoming, num_units, W=init.Uniform(),
-             b=init.Constant(0.), nonlinearity=nonlinearities.rectify,
-             **kwargs):
-    super(DenseLayer, self).__init__(incoming, **kwargs)
-    if nonlinearity is None:
-        self.nonlinearity = nonlinearities.identity
-    else:
-        self.nonlinearity = nonlinearity
+	def __init__(self, incoming, num_units, W=init.Uniform(),
+	             b=init.Constant(0.), nonlinearity=nonlinearities.rectify,
+	             **kwargs):
+	    super(DenseLayer, self).__init__(incoming, **kwargs)
+	    if nonlinearity is None:
+	        self.nonlinearity = nonlinearities.identity
+	    else:
+	        self.nonlinearity = nonlinearity
 
-    self.num_units = num_units
+	    self.num_units = num_units
 
-    num_inputs = int(np.prod(self.input_shape[1:]))
+	    num_inputs = int(np.prod(self.input_shape[1:]))
 
-    self.W = self.create_param(W, (num_inputs, num_units), name="W")
-    self.b = (self.create_param(b, (num_units,), name="b")
-              if b is not None else None)
+	    self.W = self.create_param(W, (num_inputs, num_units), name="W")
+	    self.b = (self.create_param(b, (num_units,), name="b")
+	              if b is not None else None)
 
-def get_params(self):
-    return [self.W] + self.get_bias_params()
+	def get_params(self):
+	    return [self.W] + self.get_bias_params()
 
-def get_bias_params(self):
-    return [self.b] if self.b is not None else []
+	def get_bias_params(self):
+	    return [self.b] if self.b is not None else []
 
-def get_output_shape_for(self, input_shape):
-    return (input_shape[0], self.num_units)
+	def get_output_shape_for(self, input_shape):
+	    return (input_shape[0], self.num_units)
 
-def get_output_for(self, input, *args, **kwargs):
-    if input.ndim > 2:
-        # if the input has more than two dimensions, flatten it into a
-        # batch of feature vectors.
-        # caffe basically flips all the filters, so we need to reverse some stuff to get this right.
-        # i think in gpu mode we won't need to do this
-        input = input[:,:,::-1,::-1].flatten(2)[:,:,::-1,::-1]
+	def get_output_for(self, input, *args, **kwargs):
+	    if input.ndim > 2:
+	        # if the input has more than two dimensions, flatten it into a
+	        # batch of feature vectors.
+	        # caffe basically flips all the filters, so we need to reverse some stuff to get this right.
+	        # i think in gpu mode we won't need to do this
+	        input = input[:,:,::-1,::-1].flatten(2)[:,:,::-1,::-1]
 
-    activation = T.dot(input, self.W)
-    if self.b is not None:
-        activation = activation + self.b.dimshuffle('x', 0)
-    return self.nonlinearity(activation)
+	    activation = T.dot(input, self.W)
+	    if self.b is not None:
+	        activation = activation + self.b.dimshuffle('x', 0)
+	    return self.nonlinearity(activation)
 
 
 class ReluLayer(layers.layer):
