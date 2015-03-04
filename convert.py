@@ -63,7 +63,7 @@ def convert(prototxt, caffemodel):
 			swapped = True
 
 		this_layer = parse_layer(layer, last_layer)
-		if layer['type'] in valid_lrn:
+		if layer['type'].lower() in valid_lrn:
 			break
 		if this_layer == -1:
 			# error checking
