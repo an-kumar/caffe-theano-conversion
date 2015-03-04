@@ -180,15 +180,16 @@ def conv_layer_from_params(layer, last_layer):
 	# theano's conv only allows for certain padding, not arbitrary. not sure how it will work if same border mode is not true.
 	if int(layer['kernel_size']) - (int(layer['pad']) * 2 ) == 1:
 		print "using same convolutions, this should be correct"
+		border_mode = 'same'
 	else:
-		print "this will be incorrect. the caffe net is not using same convolutions (i think). you should check what their doing, go into layers.py and fix this accordingly"
-		raise Exception ("this will probably not work but try to comment this out if oyu want")
+		print "using valid border mode, this should work but who knows"
+		border_mode='valid'
 
 	num_filters = int(layer['num_output'])
 	filter_size = (int(layer['kernel_size']), int(layer['kernel_size'])) # must be a tuple
 	strides = (int(layer['stride']),int(layer['stride'])) # can only suport square strides anyways
 	## border mode is wierd...
-	border_mode = 'same'
+	
 	nonlinearity=nonlinearities.identity
 
 	conv = layers.Conv2DLayer(last_layer, num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity)
