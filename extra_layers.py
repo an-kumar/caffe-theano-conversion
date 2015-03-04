@@ -66,7 +66,7 @@ class CaffeConv2DLayer(layers.Conv2DLayer):
                 tensors.append(self.convolution(inp, self.W[self.num_filters/2,:,:,:], subsample=self.strides,
                                       image_shape=input_shape,
                                       filter_shape=filter_shape,
-                                      border_mode=self.border_mode))
+                                      border_mode='full'))
             conved = T.concatenate(tensors, axis=1)
             shift_x = (self.filter_size[0] - 1) // 2
             shift_y = (self.filter_size[1] - 1) // 2
