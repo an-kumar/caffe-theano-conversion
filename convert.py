@@ -234,12 +234,15 @@ def softmax_layer_from_params(layer, last_layer):
 # ===[ Tests ] ===#
 
 def test_similarity(model, net):
-	random_mat = np.random.randn(10,3,224,224) #hard coded for VGG ILSVRC 15
-	fprop = net.forward(**{net.input[0]:random_mat})
+	inp_shape= net.blobs['data'].data.shape
+	random_mat = np.random.randn(**inp_shape) #hard coded for VGG ILSVRC 15
+	fprop = net.forward(**{net.inputs[0]:random_mat})
 	outlist = model.forward(random_mat)
 
 	# print fprop vs outlist
+	print 'L2 distance between output of caffe and output of theano'
 	print np.sum((fprop - outlist[0])**2)
+	print 'Max absolute different between entries in caffe and entries in theano'
 	print np.amax(np.abs(fprop-outlist[0]))
 
 if __name__ == '__main__':
