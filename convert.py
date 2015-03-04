@@ -78,7 +78,7 @@ def set_params(theano_layer, net, layer_params):
 	net is the caffe net
 	layer_params is the layer params
 	'''
-	if len(theano_layer.params)== 0:
+	if len(theano_layer.get_params())== 0:
 		return # no params to set
 	else:
 		if layer_params['type'] == 'CONVOLUTION' or layer_params['type'] == 'Convolution':
