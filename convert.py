@@ -211,7 +211,7 @@ def cuda_pooling_layer_from_params(layer, last_layer):
 def ip_layer_from_params(layer, last_layer):
 	num_units=int(layer['num_output'])
 	nonlinearity=nonlinearities.identity
-	if cuda:
+	if cuda==False:
 		dense = extra_layers.CaffeDenseLayer(last_layer, num_units=num_units, nonlinearity=nonlinearity)
 	else:
 		dense = layers.DenseLayer(last_layer, num_units=num_units, nonlinearity=nonlinearity)
@@ -227,5 +227,21 @@ def dropout_layer_from_params(layer, last_layer):
 def softmax_layer_from_params(layer, last_layer):
 	return extra_layers.SoftmaxLayer(last_layer)
 
+
+
+
+
+# ===[ Tests ] ===#
+
+def test_similarity(model, net):
+	random_mat = np.random.randn(10,3,224,224) #hard coded for VGG ILSVRC 15
+	fprop = net.forward(**{net.input[0] = random_mat})
+	outlist = model.forward(random_mat)
+
+	# print fprop vs outlist
+	print np.sum((fprop - outlist[0])**2)
+	print np.amax(np.abs(fprop-outlist[0]))
+
 if __name__ == '__main__':
-	forward, net, all_layers = convert('VGG_ILSVRC_16_layers_deploy.prototxt','VGG_ILSVRC_16_layers.caffemodel')
+	model, net, all_layers = convert('VGG_ILSVRC_16_layers_deploy.prototxt','VGG_ILSVRC_16_layers.caffemodel')
+	test_similarity(model, net)
