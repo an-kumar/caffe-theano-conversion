@@ -41,11 +41,11 @@ def convert(prototxt, caffemodel):
 
 	# create input layer
 	# this actually ends up being c01b shaped if cuda, but we pass in bc01
-	if cuda == False:
-		last_layer = inp_layer = layers.InputLayer(tuple(input_dims), name='data')
-	else:
+	#if cuda == False:
+	last_layer = inp_layer = layers.InputLayer(tuple(input_dims), name='data')
+	#else:
 		# this actually ends up being c01b shaped if cuda, but we pass in bc01, so we need to reshuffled
-		last_layer = inp_layer = layers.InputLayer((input_dims[1], input_dims[2], input_dims[3], input_dims[0]), name='data')
+	#	last_layer = inp_layer = layers.InputLayer((input_dims[1], input_dims[2], input_dims[3], input_dims[0]), name='data')
 
 
 	# go thru layers and create the theano layer 
