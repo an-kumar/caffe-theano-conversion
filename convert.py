@@ -242,9 +242,9 @@ def test_similarity(model, net):
 
 	# print fprop vs outlist
 	print 'L2 distance between output of caffe and output of theano'
-	print np.sum((fprop[fprop.keys()[0]] - outlist[0])**2)
+	print np.sum((fprop[fprop.keys()[0]][:,:,0,0] - outlist[0])**2)
 	print 'Max absolute different between entries in caffe and entries in theano'
-	print np.amax(np.abs(fprop[fprop.keys()[0]]-outlist[0]))
+	print np.amax(np.abs(fprop[fprop.keys()[0]][:,:,0,0]-outlist[0]))
 
 if __name__ == '__main__':
 	import argparse
