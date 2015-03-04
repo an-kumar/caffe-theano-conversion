@@ -9,9 +9,9 @@ class LasagneModel(object):
 		# get all the layers
 		self.all_layers = ll.get_all_layers(last_layer)
 		# save input, last layer
-		# currently assumed that all_layers[0] will be input
+		# currently assumed that all_layers[-1] will be input (this is how it should be, i think, but edge cases might exist)
 		self.last_layer = last_layer
-		self.input_layer = self.all_layers[0]
+		self.input_layer = self.all_layers[-1]
 
 
 	def compile_forward(self, nOutputs=1):
