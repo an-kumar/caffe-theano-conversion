@@ -34,7 +34,7 @@ class CaffeConv2DLayer(layers.Conv2DLayer):
             tensors=[]
             for g in range(self.group):
                 inp = input[:,g*(filter_shape[1]/self.group):(g+1)*(filter_shape[1]/self.group),:,:]
-                tensors.append(self.convolution(inp, self.W[self.num_filters/2,:,:,:], subsample=self.strides,
+                tensors.append(self.convolution(inp, self.W[g*(self.num_filters/2):(g+1)*(self.num_filters/2),:,:,:], subsample=self.strides,
                                       image_shape=input_shape,
                                       filter_shape=filter_shape,
                                       border_mode=self.border_mode))
