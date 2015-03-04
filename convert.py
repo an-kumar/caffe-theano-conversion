@@ -64,8 +64,6 @@ def convert(prototxt, caffemodel):
 			continue
 		
 		set_params(this_layer, net, layer)
-		if layer['type'].lower() in valid_ip:
-			break
 		last_layer = this_layer
 		all_layers.append(this_layer)
 		
