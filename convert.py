@@ -222,7 +222,7 @@ def cuda_pooling_layer_from_params(layer, last_layer):
 	ds = (int(layer['kernel_size']),int(layer['kernel_size'])) # cuda only supports square anyways
 	strides = (int(layer['stride']), int(layer['stride'])) #only square strides as well
 
-	pool = cuda_convnet.MaxPool2DCCLayer(last_layer, ds=ds, strides=strides)
+	pool = extra_layers.CaffeMaxPool2DCCLayer(last_layer, ds=ds, strides=strides)
 	return pool
 
 def ip_layer_from_params(layer, last_layer):
