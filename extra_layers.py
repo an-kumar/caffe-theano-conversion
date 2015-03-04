@@ -26,7 +26,7 @@ class CaffeConv2DLayer(layers.Conv2DLayer):
         # the optional input_shape argument is for when get_output_for is
         # called directly with a different shape than self.input_shape.
         if input_shape is None:
-            input_shape = self.input_shape
+            input_shape = self.input_shape[:,self.input_shape/self.group,:,:]
 
         filter_shape = self.get_W_shape()
 
@@ -43,6 +43,7 @@ class CaffeConv2DLayer(layers.Conv2DLayer):
         elif self.border_mode == 'same':
             tensors=[]
             for g in range(self.group):
+                print 
                 inp = input[:,g*(filter_shape[1]/self.group):(g+1)*(filter_shape[1]/self.group),:,:]
                 tensors.append(self.convolution(inp, self.W[self.num_filters/2,:,:,:], subsample=self.strides,
                                       image_shape=input_shape,
