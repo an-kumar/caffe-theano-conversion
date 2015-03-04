@@ -5,8 +5,12 @@ import extra_layers
 from model import LasagneModel
 try:
 	from lasagne.layers import cuda_convnet
+	print "===============\n"*10
+	print "using cuda convnet wrappers"
 	cuda = True
-except:
+except Exception as e:
+	print e
+	raise
 	print "probably no GPU, or no pylearn2 capabilities; using normal"
 	cuda = False
 import lasagne.layers as layers
