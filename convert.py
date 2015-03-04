@@ -176,8 +176,9 @@ def cuda_conv_layer_from_params(layer, last_layer):
 	border_mode = None
 	pad = int(layer['pad'])
 	nonlinearity=nonlinearities.identity
+	groups= int(layer['group'])
 			
-	conv = cuda_convnet.Conv2DCCLayer(last_layer, num_filters=num_filters,filter_size=filter_size, strides=strides, border_mode=border_mode, pad=pad, nonlinearity=nonlinearity)
+	conv = cuda_convnet.CaffeConv2DCCLayer(last_layer, groups=groups, num_filters=num_filters,filter_size=filter_size, strides=strides, border_mode=border_mode, pad=pad, nonlinearity=nonlinearity)
 	return conv
 
 def conv_layer_from_params(layer, last_layer):
