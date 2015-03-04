@@ -38,7 +38,7 @@ class CaffeConv2DLayer(layers.Conv2DLayer):
                                       image_shape=input_shape,
                                       filter_shape=filter_shape,
                                       border_mode=self.border_mode))
-            conved = T.concatenate(*tensors, axis=0)
+            conved = T.concatenate(tensors, axis=1)
 
         elif self.border_mode == 'same':
             tensors=[]
@@ -49,7 +49,7 @@ class CaffeConv2DLayer(layers.Conv2DLayer):
                                       image_shape=input_shape,
                                       filter_shape=filter_shape,
                                       border_mode=self.border_mode))
-            conved = T.concatenate(*tensors, axis=0)
+            conved = T.concatenate(tensors, axis=0)
             shift_x = (self.filter_size[0] - 1) // 2
             shift_y = (self.filter_size[1] - 1) // 2
             conved = conved[:, :, shift_x:input_shape[2] + shift_x,
