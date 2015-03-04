@@ -26,7 +26,7 @@ class CaffeConv2DLayer(layers.Conv2DLayer):
         # the optional input_shape argument is for when get_output_for is
         # called directly with a different shape than self.input_shape.
         if input_shape is None:
-            input_shape = self.input_shape[:,self.input_shape/self.group,:,:]
+            input_shape = self.input_shape[:,self.input_shape[1]/self.group,:,:]
 
         filter_shape = self.get_W_shape()
 
