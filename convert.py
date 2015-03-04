@@ -99,7 +99,7 @@ def set_conv_params(theano_layer, net, layer_params):
 	# b needs to just be the last index
 	b = b[0,0,0,:]
 	# W needs to be fixed
-	W = W[:,::-1,::-1,:]
+	W = W[:,:,::-1,::-1]
 	theano_layer.W.set_value(W.astype(theano.config.floatX))
 	theano_layer.b.set_value(b.astype(theano.config.floatX))
 
@@ -248,6 +248,8 @@ def test_similarity(model, net):
 	print 'Max absolute different between entries in caffe and entries in theano'
 	print np.amax(np.abs(fprop[fprop.keys()[0]][:,:,0,0]-outlist[0]))
 
+	return outlist
+
 if __name__ == '__main__':
 	import argparse
 	parser = argparse.ArgumentParser()
@@ -258,4 +260,4 @@ if __name__ == '__main__':
 	print 'Converting model...'
 	model, net, all_layers = convert(args.prototxt,args.caffemodel)
 	print 'testing similarity...'
-	test_similarity(model, net)
+	outlist =test_similarity(model, net)
