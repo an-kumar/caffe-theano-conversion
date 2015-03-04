@@ -209,7 +209,7 @@ def cuda_pooling_layer_from_params(layer, last_layer):
 
 def ip_layer_from_params(layer, last_layer):
 	num_units=int(layer['num_output'])
-	nonlinearity=layers.identity
+	nonlinearity=nonlinearities.identity
 	if cuda:
 		dense = extra_layers.CaffeDenseLayer(last_layer, num_units=num_units, nonlinearity=nonlinearity)
 	else:
