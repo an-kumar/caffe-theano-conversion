@@ -12,8 +12,8 @@ import lasagne.init as init
 
 
 class CaffeConv2DLayer(layers.Conv2DLayer):
-    def __init__(self, incoming, num_filters, filter_size, group=1, strides=(1, 1), order_mode="valid", untie_biases=False, W=init.Uniform(), b=init.Constant(0.), nonlinearity=nonlinearities.rectify,convolution=T.nnet.conv2d, **kwargs):
-        super(CaffeConv2DLayer,self).__init__(incoming, num_filters, filter_size, strides=(1, 1), order_mode="valid", untie_biases=False, W=init.Uniform(), b=init.Constant(0.), nonlinearity=nonlinearities.rectify,convolution=T.nnet.conv2d, **kwargs)
+    def __init__(self, incoming, num_filters, filter_size, group=1, strides=(1, 1), border_mode="valid", untie_biases=False, W=init.Uniform(), b=init.Constant(0.), nonlinearity=nonlinearities.rectify,convolution=T.nnet.conv2d, **kwargs):
+        super(CaffeConv2DLayer,self).__init__(incoming, num_filters, filter_size, strides=(1, 1), border_mode="valid", untie_biases=False, W=init.Uniform(), b=init.Constant(0.), nonlinearity=nonlinearities.rectify,convolution=T.nnet.conv2d, **kwargs)
         self.group= group
 
     def get_W_shape(self):
