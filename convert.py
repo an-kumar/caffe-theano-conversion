@@ -206,8 +206,12 @@ def relu_layer_from_params(layer, last_layer):
 
 def pooling_layer_from_params(layer, last_layer):
 	ds=(int(layer['kernel_size']),int(layer['kernel_size'])) #caffe only does square kernels
+	strides = (int(layer['stride']), int(layer['stride']))
 
-	pool = layers.MaxPool2DLayer(last_layer, ds=ds) # ignore border is set to False, maybe look into how caffe does borders if the strides don't work perfectly
+	if strides[0] != ds[0]:
+		pool = extra_layers.CaffeMaxPool2DLayer(last_layer,ds=ds, strides=strides)
+	else:
+		pool = layers.MaxPool2DLayer(last_layer, ds=ds) # ignore border is set to False, maybe look into how caffe does borders if the strides don't work perfectly
 	return pool
 
 def cuda_pooling_layer_from_params(layer, last_layer):

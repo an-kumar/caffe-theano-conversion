@@ -11,10 +11,28 @@ import lasagne.nonlinearities as nonlinearities
 import lasagne.init as init
 
 
+class CaffeMaxPool2DLayer(layers.MaxPool2DLayer):
+    def __init__(self, incoming, ds, strides=None, ignore_border=True, **kwargs):
+        if strides==None:
+            self.strides=ds
+        else:
+            self.strides=strides
+        super(CaffeMaxPool2DLayer,self).__init__(incoming,ds,ignore_border=ignore_border,**kwargs)
+
+    def get_output_shape_for(self, input_shape):
+        output_shape = list(input_shape)  # copy / convert to mutable list
+        output_shape[2] = (output_shape[2] - self.ds[0])/self.strides[0] + 1
+        output_shape[3] = (output_shape[3] - self.ds[1])/self.strides[1] + 1
+
+        return tuple(output_shape)
+
+    def get_output_for(self, input, *args, **kwargs):
+        return downsample.max_pool_2d(input, self.ds, st=self.strides, ignore_border=self.ignore_border)
+
 class CaffeConv2DLayer(layers.Conv2DLayer):
     def __init__(self, incoming, num_filters, filter_size, group=1, strides=(1, 1), border_mode="valid", untie_biases=False, W=init.Uniform(), b=init.Constant(0.), nonlinearity=nonlinearities.rectify,convolution=T.nnet.conv2d, **kwargs):
         self.group= group
-        super(CaffeConv2DLayer,self).__init__(incoming, num_filters, filter_size, strides=(1, 1), border_mode="valid", untie_biases=False, W=init.Uniform(), b=init.Constant(0.), nonlinearity=nonlinearities.rectify,convolution=T.nnet.conv2d, **kwargs)
+        super(CaffeConv2DLayer,self).__init__(incoming, num_filters, filter_size, strides=strides, border_mode=border_mode, untie_biases=untie_biases, W=W, b=b, nonlinearity=nonlinearity,convolution=convolution, **kwargs)
 
     def get_W_shape(self):
         num_input_channels = self.input_shape[1]
