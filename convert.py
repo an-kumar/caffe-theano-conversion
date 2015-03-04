@@ -98,6 +98,8 @@ def set_conv_params(theano_layer, net, layer_params):
 	b = net.params[name][1].data
 	# b needs to just be the last index
 	b = b[0,0,0,:]
+	# W needs to be fixed
+	W = W[:,::-1,::-1,:]
 	theano_layer.W.set_value(W.astype(theano.config.floatX))
 	theano_layer.b.set_value(b.astype(theano.config.floatX))
 
@@ -212,7 +214,7 @@ def ip_layer_from_params(layer, last_layer):
 	num_units=int(layer['num_output'])
 	nonlinearity=nonlinearities.identity
 	if cuda==False:
-		dense = extra_layers.CaffeDenseLayer(last_layer, num_units=num_units, nonlinearity=nonlinearity)
+		dense = layers.DenseLayer(last_layer, num_units=num_units, nonlinearity=nonlinearity)
 	else:
 		dense = layers.DenseLayer(last_layer, num_units=num_units, nonlinearity=nonlinearity)
 	return dense
