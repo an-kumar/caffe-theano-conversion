@@ -5,10 +5,12 @@ defines some extra layers in lasagne form to use to convert caffe models
 import numpy as np
 import theano
 import theano.tensor as T
+from theano.tensor.signal import downsample
 
 import lasagne.layers as layers
 import lasagne.nonlinearities as nonlinearities
 import lasagne.init as init
+
 
 
 class CaffeMaxPool2DLayer(layers.MaxPool2DLayer):
