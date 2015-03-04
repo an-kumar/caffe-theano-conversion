@@ -237,13 +237,14 @@ def test_similarity(model, net):
 	inp_shape= net.blobs['data'].data.shape
 	random_mat = np.random.randn(*inp_shape) #hard coded for VGG ILSVRC 15
 	fprop = net.forward(**{net.inputs[0]:random_mat})
+	print fprop[fprop.keys()[0]].shape
 	outlist = model.forward(random_mat)
 
 	# print fprop vs outlist
 	print 'L2 distance between output of caffe and output of theano'
-	print np.sum((fprop - outlist[0])**2)
+	print np.sum((fprop[fprop.keys()[0]] - outlist[0])**2)
 	print 'Max absolute different between entries in caffe and entries in theano'
-	print np.amax(np.abs(fprop-outlist[0]))
+	print np.amax(np.abs(fprop[fprop.keys()[0]]-outlist[0]))
 
 if __name__ == '__main__':
 	import argparse
