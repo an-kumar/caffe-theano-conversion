@@ -66,6 +66,8 @@ def convert(prototxt, caffemodel):
 		set_params(this_layer, net, layer)
 		last_layer = this_layer
 		all_layers.append(this_layer)
+		if layer['type'].lower() in valid_pooling:
+			break
 
 	model = LasagneModel(last_layer)
 	model.compile_forward(nOutputs=0) # 0 returns all layers
