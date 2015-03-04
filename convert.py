@@ -237,7 +237,7 @@ def softmax_layer_from_params(layer, last_layer):
 
 def test_similarity(model, net):
 	inp_shape= net.blobs['data'].data.shape
-	random_mat = np.random.randn(*inp_shape) #hard coded for VGG ILSVRC 15
+	random_mat = np.random.randn(*inp_shape).astype(theano.config.floatX) #hard coded for VGG ILSVRC 15
 	fprop = net.forward(**{net.inputs[0]:random_mat})
 	print fprop[fprop.keys()[0]].shape
 	outlist = model.forward(random_mat)
