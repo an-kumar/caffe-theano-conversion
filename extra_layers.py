@@ -8,7 +8,7 @@ import theano.tensor as T
 
 import lasagne.layers as layers
 import lasagne.nonlinearities as nonlinearities
-
+import lasagne.init as init
 
 
 class SoftmaxLayer(layers.Layer):
