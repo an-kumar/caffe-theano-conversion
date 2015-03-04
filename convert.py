@@ -246,5 +246,13 @@ def test_similarity(model, net):
 	print np.amax(np.abs(fprop-outlist[0]))
 
 if __name__ == '__main__':
-	model, net, all_layers = convert('VGG_ILSVRC_16_layers_deploy.prototxt','VGG_ILSVRC_16_layers.caffemodel')
+	import argparse
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--prototxt", default='VGG_ILSVRC_16_layers_deploy.prototxt', help="model definition file")
+	parser.add_argument("--caffemodel", default='VGG_ILSVRC_16_layers.caffemodel',help="model binary")
+	args = parser.parse_args()
+
+	print 'Converting model...'
+	model, net, all_layers = convert(args.prototxt,args.caffemodel)
+	print 'testing similarity...'
 	test_similarity(model, net)
