@@ -227,4 +227,4 @@ def softmax_layer_from_params(layer, last_layer):
 	return extra_layers.SoftmaxLayer(last_layer)
 
 if __name__ == '__main__':
-	forward, net, all_layers = convert('VGG_ILSVRC_16_layers_deploy.prototxt','VGG_ILSVRC_16_layers.caffemodelf')
+	forward, net, all_layers = convert('VGG_ILSVRC_16_layers_deploy.prototxt','VGG_ILSVRC_16_layers.caffemodel')
