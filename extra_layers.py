@@ -6,10 +6,9 @@ import numpy as np
 import theano
 import theano.tensor as T
 from theano.tensor.signal import downsample
-try:
-    from lasagne import cuda_convnet
-except:
-    print 'no cuda convnet availability'
+
+from lasagne import cuda_convnet
+
 
 import lasagne.layers as layers
 import lasagne.nonlinearities as nonlinearities
