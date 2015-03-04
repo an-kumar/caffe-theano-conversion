@@ -52,15 +52,15 @@ def convert(prototxt, caffemodel):
 	all_layers = [inp_layer]
 	swapped = False
 	for layer in architecture:
-		if (layer['type'] == 'INNER_PRODUCT' or layer['type'] == 'InnerProduct') and swapped==False and cuda==True:
-			# need to add a reshaping layer
-			'''
-			this might not be needed, check lasagne stuff
-			'''
-			reshape_layer = cuda_convnet.ShuffleC01BToBC01Layer(last_layer)
-			all_layers.append(reshape_layer)
-			last_layer = reshape_layer
-			swapped = True
+		# if (layer['type'] == 'INNER_PRODUCT' or layer['type'] == 'InnerProduct') and swapped==False and cuda==True:
+		# 	# need to add a reshaping layer
+		# 	'''
+		# 	this might not be needed, check lasagne stuff
+		# 	'''
+		# 	reshape_layer = cuda_convnet.ShuffleC01BToBC01Layer(last_layer)
+		# 	all_layers.append(reshape_layer)
+		# 	last_layer = reshape_layer
+		# 	swapped = True
 
 		this_layer = parse_layer(layer, last_layer)
 #		if layer['type'].lower() in valid_lrn:
