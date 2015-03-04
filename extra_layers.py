@@ -26,6 +26,10 @@ class CaffeConv2DCCLayer(cuda_convnet.Conv2DCCLayer):
         self.filter_acts_op = FilterActs(numGroups=self.groups, stride=self.stride, partial_sum=self.partial_sum, pad=self.pad)
 
 
+class CaffeMaxPool2DCCLayer(cuda_convnet.MaxPool2DCCLayer):
+    def __init__(self,**kwargs):
+        raise NotImplementedError
+
 class CaffeMaxPool2DLayer(layers.MaxPool2DLayer):
     def __init__(self, incoming, ds, strides=None, ignore_border=True, **kwargs):
         if strides==None:
