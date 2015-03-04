@@ -11,79 +11,137 @@ import lasagne.nonlinearities as nonlinearities
 import lasagne.init as init
 
 
+class CaffeConv2DLayer(layers.Conv2DLayer):
+    def __init__(self, incoming, num_filters, filter_size, group=1, strides=(1, 1), order_mode="valid", untie_biases=False, W=init.Uniform(), b=init.Constant(0.), nonlinearity=nonlinearities.rectify,convolution=T.nnet.conv2d, **kwargs):
+        super(CaffeConv2DLayer,self).__init__(incoming, num_filters, filter_size, strides=(1, 1), order_mode="valid", untie_biases=False, W=init.Uniform(), b=init.Constant(0.), nonlinearity=nonlinearities.rectify,convolution=T.nnet.conv2d, **kwargs)
+        self.group= group
+
+    def get_W_shape(self):
+        num_input_channels = self.input_shape[1]
+        assert num_input_channels % group == 0
+        return (self.num_filters, num_input_channels/group, self.filter_size[0], self.filter_size[1])
+
+    def get_output_for(self, input, input_shape=None, *args, **kwargs):
+        # the optional input_shape argument is for when get_output_for is
+        # called directly with a different shape than self.input_shape.
+        if input_shape is None:
+            input_shape = self.input_shape
+
+        filter_shape = self.get_W_shape()
+
+        if self.border_mode in ['valid', 'full']:
+            tensors=[]
+            for g in range(self.group):
+                inp = input[:,g*(filter_shape[1]/self.group):(g+1)*(filter_shape[1]/self.group),:,:]
+                tensors.append(self.convolution(inp, self.W[self.num_filters/2,:,:,:], subsample=self.strides,
+                                      image_shape=input_shape,
+                                      filter_shape=filter_shape,
+                                      border_mode=self.border_mode))
+            conved = T.concatenate(*tensors, axis=0)
+
+        elif self.border_mode == 'same':
+            tensors=[]
+            for g in range(self.group):
+                inp = input[:,g*(filter_shape[1]/self.group):(g+1)*(filter_shape[1]/self.group),:,:]
+                tensors.append(self.convolution(inp, self.W[self.num_filters/2,:,:,:], subsample=self.strides,
+                                      image_shape=input_shape,
+                                      filter_shape=filter_shape,
+                                      border_mode=self.border_mode))
+            conved = T.concatenate(*tensors, axis=0)
+            shift_x = (self.filter_size[0] - 1) // 2
+            shift_y = (self.filter_size[1] - 1) // 2
+            conved = conved[:, :, shift_x:input_shape[2] + shift_x,
+                            shift_y:input_shape[3] + shift_y]
+        else:
+            raise RuntimeError("Invalid border mode: '%s'" % self.border_mode)
+
+        if self.b is None:
+            activation = conved
+        elif self.untie_biases:
+            activation = conved + self.b.dimshuffle('x', 0, 1, 2)
+        else:
+            activation = conved + self.b.dimshuffle('x', 0, 'x', 'x')
+
+        return self.nonlinearity(activation)
+
+       
+
+
+
+
 class SoftmaxLayer(layers.Layer):
-	def __init__(self, incoming, **kwargs):
-		super(SoftmaxLayer,self).__init__(incoming, **kwargs)
+    def __init__(self, incoming, **kwargs):
+        super(SoftmaxLayer,self).__init__(incoming, **kwargs)
 
-	def get_output_shape_for(self, input_shape):
-		return input_shape
+    def get_output_shape_for(self, input_shape):
+        return input_shape
 
-	def get_output_for(self, input, *args, **kwargs):
-		return T.nnet.softmax(input)
+    def get_output_for(self, input, *args, **kwargs):
+        return T.nnet.softmax(input)
 
 class IdentityLayer(layers.Layer):
-	def __init__(self, incoming, **kwargs):
-		super(IdentityLayer,self).__init__(incoming, **kwargs)
+    def __init__(self, incoming, **kwargs):
+        super(IdentityLayer,self).__init__(incoming, **kwargs)
 
-	def get_output_shape_for(self, input_shape):
-		return input_shape
+    def get_output_shape_for(self, input_shape):
+        return input_shape
 
-	def get_output_for(self, input, *args, **kwargs):
-		return input
+    def get_output_for(self, input, *args, **kwargs):
+        return input
 
 
 # very heavily copied from lasagne's own dense layer, but caffe does everything backwards so this needs to
 # be slightly changed
 class CaffeDenseLayer(layers.Layer):
-	def __init__(self, incoming, num_units, W=init.Uniform(),
-	             b=init.Constant(0.), nonlinearity=nonlinearities.rectify,
-	             **kwargs):
-	    super(CaffeDenseLayer, self).__init__(incoming, **kwargs)
-	    if nonlinearity is None:
-	        self.nonlinearity = nonlinearities.identity
-	    else:
-	        self.nonlinearity = nonlinearity
+    def __init__(self, incoming, num_units, W=init.Uniform(),
+                 b=init.Constant(0.), nonlinearity=nonlinearities.rectify,
+                 **kwargs):
+        super(CaffeDenseLayer, self).__init__(incoming, **kwargs)
+        if nonlinearity is None:
+            self.nonlinearity = nonlinearities.identity
+        else:
+            self.nonlinearity = nonlinearity
 
-	    self.num_units = num_units
+        self.num_units = num_units
 
-	    num_inputs = int(np.prod(self.input_shape[1:]))
+        num_inputs = int(np.prod(self.input_shape[1:]))
 
-	    self.W = self.create_param(W, (num_inputs, num_units), name="W")
-	    self.b = (self.create_param(b, (num_units,), name="b")
-	              if b is not None else None)
+        self.W = self.create_param(W, (num_inputs, num_units), name="W")
+        self.b = (self.create_param(b, (num_units,), name="b")
+                  if b is not None else None)
 
-	def get_params(self):
-	    return [self.W] + self.get_bias_params()
+    def get_params(self):
+        return [self.W] + self.get_bias_params()
 
-	def get_bias_params(self):
-	    return [self.b] if self.b is not None else []
+    def get_bias_params(self):
+        return [self.b] if self.b is not None else []
 
-	def get_output_shape_for(self, input_shape):
-	    return (input_shape[0], self.num_units)
+    def get_output_shape_for(self, input_shape):
+        return (input_shape[0], self.num_units)
 
-	def get_output_for(self, input, *args, **kwargs):
-	    if input.ndim > 2:
-	        # if the input has more than two dimensions, flatten it into a
-	        # batch of feature vectors.
-	        # caffe basically flips all the filters, so we need to reverse some stuff to get this right.
-	        # i think in gpu mode we won't need to do this
-	        input = input[:,:,::-1,::-1].flatten(2)
+    def get_output_for(self, input, *args, **kwargs):
+        if input.ndim > 2:
+            # if the input has more than two dimensions, flatten it into a
+            # batch of feature vectors.
+            # caffe basically flips all the filters, so we need to reverse some stuff to get this right.
+            # i think in gpu mode we won't need to do this
+            input = input[:,:,::-1,::-1].flatten(2)
 
-	    activation = T.dot(input, self.W)
-	    if self.b is not None:
-	        activation = activation + self.b.dimshuffle('x', 0)
-	    return self.nonlinearity(activation)
+        activation = T.dot(input, self.W)
+        if self.b is not None:
+            activation = activation + self.b.dimshuffle('x', 0)
+        return self.nonlinearity(activation)
 
 
 class ReluLayer(layers.Layer):
-	def __init__(self, incoming, **kwargs):
-		super(ReluLayer,self).__init__(incoming, **kwargs)
+    def __init__(self, incoming, **kwargs):
+        super(ReluLayer,self).__init__(incoming, **kwargs)
 
-	def get_output_shape_for(self, input_shape):
-		return input_shape
+    def get_output_shape_for(self, input_shape):
+        return input_shape
 
-	def get_output_for(self, input, *args, **kwargs):
-		return nonlinearities.rectify(input)
+    def get_output_for(self, input, *args, **kwargs):
+        return nonlinearities.rectify(input)
 
 
 # TAKEN FROM LASAGNE PULL REQUEST + PYLEARN2

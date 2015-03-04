@@ -188,11 +188,15 @@ def conv_layer_from_params(layer, last_layer):
 	num_filters = int(layer['num_output'])
 	filter_size = (int(layer['kernel_size']), int(layer['kernel_size'])) # must be a tuple
 	strides = (int(layer['stride']),int(layer['stride'])) # can only suport square strides anyways
+	group = int(layer['stride'])
 	## border mode is wierd...
 	
 	nonlinearity=nonlinearities.identity
 
-	conv = layers.Conv2DLayer(last_layer, num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity)
+	if group > 1:
+		conv = extra_layers.CaffeConv2dLayer(last_layer, group=group,num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity)
+	else:
+		conv = layers.Conv2DLayer(last_layer, num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity)
 	return conv
 
 def relu_layer_from_params(layer, last_layer):
