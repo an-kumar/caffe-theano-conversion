@@ -11,7 +11,7 @@ import lasagne.nonlinearities as nonlinearities
 
 
 
-class SoftmaxLayer(layers.layer):
+class SoftmaxLayer(layers.Layer):
 	def __init__(self, incoming, **kwargs):
 		super(SoftmaxLayer,self).__init__(incoming, **kwargs)
 
@@ -21,7 +21,7 @@ class SoftmaxLayer(layers.layer):
 	def get_output_for(self, input, *args, **kwargs):
 		return T.nnet.softmax(input)
 
-class IdentityLayer(layers.layer):
+class IdentityLayer(layers.Layer):
 	def __init__(self, incoming, **kwargs):
 		super(IdentityLayer,self).__init__(incoming, **kwargs)
 
@@ -34,7 +34,7 @@ class IdentityLayer(layers.layer):
 
 # very heavily copied from lasagne's own dense layer, but caffe does everything backwards so this needs to
 # be slightly changed
-class CaffeDenseLayer(layers.layer):
+class CaffeDenseLayer(layers.Layer):
 	def __init__(self, incoming, num_units, W=init.Uniform(),
 	             b=init.Constant(0.), nonlinearity=nonlinearities.rectify,
 	             **kwargs):
@@ -75,7 +75,7 @@ class CaffeDenseLayer(layers.layer):
 	    return self.nonlinearity(activation)
 
 
-class ReluLayer(layers.layer):
+class ReluLayer(layers.Layer):
 	def __init__(self, incoming, **kwargs):
 		super(ReluLayer,self).__init__(incoming, **kwargs)
 
