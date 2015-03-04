@@ -2,6 +2,7 @@ import theano
 import numpy as np
 import theano.tensor as T
 import extra_layers
+from model import LasagneModel
 try:
 	from lasagne.layers import cuda_convnet
 	cuda = True
@@ -12,6 +13,7 @@ import lasagne.layers as layers
 from parse_model_def import parse_model_def as parse
 import caffe
 import lasagne.nonlinearities as nonlinearities
+
 
 # valid names (lowercased)
 valid_conv = set(['convolution'])
@@ -65,10 +67,9 @@ def convert(prototxt, caffemodel):
 		last_layer = this_layer
 		all_layers.append(this_layer)
 
-	X = T.tensor4('data', dtype=theano.config.floatX) # This will be the data we pass in; we could change this to an index into a batch for example, this is just for testing how this conversion script works
-	givens = {inp_layer.input_var:X}
-	forward = theano.function([X], [layer.output(dropout_active=False) for layer in all_layers],givens=givens)
-	return forward, net, all_layers
+	model = LasagneModel(last_layer)
+	model.compile_forward(nOutputs=0) # 0 returns all layers
+	return model, net, all_layers
 
 
 
