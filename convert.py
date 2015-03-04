@@ -170,7 +170,7 @@ def lrn_layer_from_params(layer, last_layer):
 
 def cuda_conv_layer_from_params(layer, last_layer):
 	num_filters = int(layer['num_output'])
-	filter_size = int(layer['kernel_size'])
+	filter_size = (int(layer['kernel_size']),int(layer['kernel_size']) #only suppose square filters
 	strides = (int(layer['stride']),int(layer['stride'])) # can only suport square strides anyways
 	## border mode is wierd...
 	border_mode = None
