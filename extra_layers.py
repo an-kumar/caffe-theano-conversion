@@ -67,7 +67,7 @@ class CaffeDenseLayer(layers.Layer):
 	        # batch of feature vectors.
 	        # caffe basically flips all the filters, so we need to reverse some stuff to get this right.
 	        # i think in gpu mode we won't need to do this
-	        input = input[:,:,::-1,::-1].flatten(2)[:,:,::-1,::-1]
+	        input = input[:,:,::-1,::-1].flatten(2)
 
 	    activation = T.dot(input, self.W)
 	    if self.b is not None:
