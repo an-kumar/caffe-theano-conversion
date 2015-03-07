@@ -7,6 +7,7 @@ import theano
 import theano.tensor as T
 from theano.tensor.signal import downsample
 
+
 import lasagne.layers as layers
 import lasagne.nonlinearities as nonlinearities
 import lasagne.init as init

@@ -11,7 +11,6 @@ try:
 	cuda = True
 except Exception as e:
 	print e
-	raise
 	print "probably no GPU, or no pylearn2 capabilities; using normal"
 	cuda = False
 import lasagne.layers as layers
