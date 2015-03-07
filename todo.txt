@@ -1,0 +1,8 @@
+TODO:
+
+1. compile_forward should become compile and *args, **kwargs should get serialized too
+2. decompose tests correctly into different file so that python test.py or something does all of them
+3. support no caffe installation
+4. support caffe installation because it's quicker
+5. solvers, solver states, etc (make a class 'solver', lasagne probably has something like this already)
+6. work with datasets
