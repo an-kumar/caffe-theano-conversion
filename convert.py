@@ -5,6 +5,7 @@ import extra_layers
 from model import LasagneModel, dump, load
 try:
 	from lasagne.layers import cuda_convnet
+	import extra_convnet_layers
 	print "===============\n"*10
 	print "using cuda convnet wrappers"
 	cuda = True
@@ -179,7 +180,7 @@ def cuda_conv_layer_from_params(layer, last_layer):
 	nonlinearity=nonlinearities.identity
 	groups= int(layer['group'])
 			
-	conv = extra_layers.CaffeConv2DCCLayer(last_layer, groups=groups, num_filters=num_filters,filter_size=filter_size, strides=strides, border_mode=border_mode, pad=pad, nonlinearity=nonlinearity)
+	conv = extra_convnet_layers.CaffeConv2DCCLayer(last_layer, groups=groups, num_filters=num_filters,filter_size=filter_size, strides=strides, border_mode=border_mode, pad=pad, nonlinearity=nonlinearity)
 	return conv
 
 def conv_layer_from_params(layer, last_layer):
@@ -200,7 +201,7 @@ def conv_layer_from_params(layer, last_layer):
 	nonlinearity=nonlinearities.identity
 
 	if group > 1:
-		conv = extra_layers.CaffeConv2DLayer(last_layer, group=group,num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity)
+		conv = extra_convnet_layers.CaffeConv2DLayer(last_layer, group=group,num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity)
 	else:
 		conv = layers.Conv2DLayer(last_layer, num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity)
 	return conv
