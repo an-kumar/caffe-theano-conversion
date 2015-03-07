@@ -6,8 +6,10 @@ import numpy as np
 import theano
 import theano.tensor as T
 from theano.tensor.signal import downsample
-
-from lasagne.layers import cuda_convnet
+try:
+    from lasagne.layers import cuda_convnet
+except:
+    print "NO CUDA CONVNET"
 
 
 import lasagne.layers as layers
