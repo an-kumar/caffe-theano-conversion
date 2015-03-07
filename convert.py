@@ -2,7 +2,7 @@ import theano
 import numpy as np
 import theano.tensor as T
 import extra_layers
-from model import LasagneModel
+from model import LasagneModel, dump, load
 try:
 	from lasagne.layers import cuda_convnet
 	print "===============\n"*10
@@ -263,7 +263,24 @@ def test_similarity(model, net):
 	print 'Max absolute different between entries in caffe and entries in theano'
 	print np.amax(np.abs(fprop[fprop.keys()[0]][:,:,0,0]-outlist[0]))
 
-	return outlist
+	return random_mat, outlist
+
+
+def test_serialization(model,random_mat):
+	outlist_1 = model.forward(random_mat)
+
+	dump(model, 'temp_test.lm')
+
+	loaded_model = load(model, 'temp_test.lm')
+
+	outlist_2 = loaded_model.forward(random_mat)
+
+	for i in range(len(outlist_1)):
+		print 'L2 Distance between outputs:'
+		print np.sum((outlist_1[i] - outlist_2[i])**2)
+		print 'Max absolute difference between entries:'
+		print np.amax(np.abs(outlist_1[i]-outlist_2[i]))
+
 
 if __name__ == '__main__':
 	import argparse
@@ -275,4 +292,5 @@ if __name__ == '__main__':
 	print 'Converting model...'
 	model, net, all_layers = convert(args.prototxt,args.caffemodel)
 	print 'testing similarity...'
-	outlist =test_similarity(model, net)
+	random_mat, outlist =test_similarity(model, net)
+	test_serialization(model, random_mat)

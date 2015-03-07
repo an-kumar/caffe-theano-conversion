@@ -15,7 +15,7 @@ import lasagne.nonlinearities as nonlinearities
 import lasagne.init as init
 
 from theano.sandbox.cuda.basic_ops import gpu_contiguous
-# need to do my change.
+# need to do my change to the following:
 from pylearn2.sandbox.cuda_convnet.filter_acts import FilterActs
 
 
