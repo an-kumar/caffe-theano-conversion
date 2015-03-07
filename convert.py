@@ -1,5 +1,6 @@
 import theano
 import numpy as np
+import time
 import theano.tensor as T
 import extra_layers
 from model import LasagneModel, dump, load
@@ -253,10 +254,16 @@ def softmax_layer_from_params(layer, last_layer):
 def test_similarity(model, net):
 	inp_shape= net.blobs['data'].data.shape
 	random_mat = np.random.randn(*inp_shape).astype(theano.config.floatX) #hard coded for VGG ILSVRC 15
+	tick = time.time()
 	fprop = net.forward(**{net.inputs[0]:random_mat})
 	print fprop[fprop.keys()[0]].shape
+	tock = time.time()
+	print 'time: %s' % str(tock - tick)
+	tick = time.time()
 	outlist = model.forward(random_mat)
-
+	tock = time.time()
+	print 'model forward'
+	print 'time: %s' % str(tock - tick)
 	# print fprop vs outlist
 	print 'L2 distance between output of caffe and output of theano'
 	print np.sum((fprop[fprop.keys()[0]][:,:,0,0] - outlist[0])**2)
@@ -267,12 +274,13 @@ def test_similarity(model, net):
 
 
 def test_serialization(model,random_mat):
+	print "outlist_1"
 	outlist_1 = model.forward(random_mat)
-
+	print "dumping..."
 	dump(model, 'temp_test.lm')
-
-	loaded_model = load(model, 'temp_test.lm')
-
+	print "loading..."
+	loaded_model = load('temp_test.lm')
+	print "begin outlist 2"
 	outlist_2 = loaded_model.forward(random_mat)
 
 	for i in range(len(outlist_1)):
