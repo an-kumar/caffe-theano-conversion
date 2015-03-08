@@ -225,9 +225,6 @@ def softmax_layer(layer, last_layer):
 	return extra_layers.SoftmaxLayer(last_layer, name=name)
 
 
-
-
-
 def set_params_from_caffemodel(lasagne_model, caffemodel):
 	'''
 	sets the params of lasagne_model to be from the trained caffemodel.
@@ -240,83 +237,145 @@ def set_params_from_caffemodel(lasagne_model, caffemodel):
 
 	# this should be in the same order as was made by the lasagne model, but reversed. we will check that.
 	# todo: maybe just go by names, strictly? 
-	for layer in layer_params[::-1]:
+	assert len(layer_params) == len(lasagne_model.all_layers)
+	for i in range(len(layer_params[::-1])):
+		lp = layer_params[::-1][i]
+		lasagne_layer = lasagne_model.all_layers[i]
+
+		if len(lasasgne_layer.get_params()) == 0:
+			# no params to set
+			continue
+		if lp.name == lasagne_layer.name:
+			print "Names match!"
+		else:
+			print "maybe a problem. Names don't match. Continuing anyways."
+		Wblob = lp.blobs[0]
+		bblob = lp.blobs[1]
+		# get arrays of parameters
+		W = array_from_blob(Wblob)
+		b = array_from_blob(bblob)
+		# set parameters
+		set_model_params(lasagne_layer, W,b)
+
+
+def set_model_params(lasagne_layer,W,b):
+	if cuda:
+		if isinstance(lasagne_layer, cuda_convnet.Conv2DCCLayer):
+			set_cuda_conv_params(lasagne_layer, W,b)
+
+	if isinstance(lasagne_layer, layers.Conv2DLayer):
+		set_conv_params(lasagne_layer,W,b)
+	elif isinstance(lasagne_layer, layers.DenseLayer):
+		set_ip_params(lasagne_layer, W,b)
+	else:
+		raise Exception ("don't know this layers: %s" % type(lasagne_layer))
 
 
 
+def array_from_blob(blob):
+	return np.array(blob.data).reshape(blob.num, blob.channels, blob.height, blob.width)
 
+def set_conv_params(layer, W,b):
+	# b needs to just be the last index
+	b = b[0,0,0,:]
+	# W needs to be fixed
+	W = W[:,:,::-1,::-1]
+	theano_layer.W.set_value(W.astype(theano.config.floatX))
+	theano_layer.b.set_value(b.astype(theano.config.floatX))
 
+def set_cuda_conv_params(layer,W,b):
+	# b needs to just be the last index
+	b = b[0,0,0,:]
+	# W needs to be reshaped into n_features(from prev layer), size, size, n_filters
+	theano_layer.W.set_value(W.astype(theano.config.floatX))
+	theano_layer.b.set_value(b.astype(theano.config.floatX))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def set_ip_params(layer,W,b):
+	# W needs to just be the last 2, shuffled
+	W = W[0,0,:,:].T
+	# b needs to just be the last index
+	b = b[0,0,0,:]
+	theano_layer.W.set_value(W.astype(theano.config.floatX))
+	theano_layer.b.set_value(b.astype(theano.config.floatX))
 
 
 
 
 def convert(prototxt, caffemodel):
 	'''
-	prototxt is a .prototxt file
-	caffemodel is a .caffemodel file
+	wrapper around the two functions above
 	'''
-	# parse the prototxt file
-	input_dims, architecture = parse(prototxt)
-	input_dims2, architecture2 = parse2(prototxt)
-	return input_dims, architecture, input_dims2, architecture2
-	assert len(input_dims) == 4 #bc01
 	net = caffe.Net(prototxt, caffemodel, caffe.TEST)
-
-	# create input layer
-	# this actually ends up being c01b shaped if cuda, but we pass in bc01
-	#if cuda == False:
-	last_layer = inp_layer = layers.InputLayer(tuple(input_dims), name='data')
-	#else:
-		# this actually ends up being c01b shaped if cuda, but we pass in bc01, so we need to reshuffled
-	#	last_layer = inp_layer = layers.InputLayer((input_dims[1], input_dims[2], input_dims[3], input_dims[0]), name='data')
+	lmodel = convert_model_def(prototxt)
+	set_params_from_caffemodel(lmodel, caffemodel)
+	model.compile_forward(nOutputs=0)
+	return model, net
 
 
-	# go thru layers and create the theano layer 
-	all_layers = [inp_layer]
-	swapped = False
-	for layer in architecture:
-		# if (layer['type'] == 'INNER_PRODUCT' or layer['type'] == 'InnerProduct') and swapped==False and cuda==True:
-		# 	# need to add a reshaping layer
-		# 	'''
-		# 	this might not be needed, check lasagne stuff
-		# 	'''
-		# 	reshape_layer = cuda_convnet.ShuffleC01BToBC01Layer(last_layer)
-		# 	all_layers.append(reshape_layer)
-		# 	last_layer = reshape_layer
-		# 	swapped = True
 
-		this_layer = parse_layer(layer, last_layer)
-#		if layer['type'].lower() in valid_lrn:
-#`			break
-		if this_layer == -1:
-			# error checking
-			continue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def convert(prototxt, caffemodel):
+# 	'''
+# 	prototxt is a .prototxt file
+# 	caffemodel is a .caffemodel file
+# 	'''
+# 	# parse the prototxt file
+# 	input_dims, architecture = parse(prototxt)
+# 	input_dims2, architecture2 = parse2(prototxt)
+# 	return input_dims, architecture, input_dims2, architecture2
+# 	assert len(input_dims) == 4 #bc01
+# 	net = caffe.Net(prototxt, caffemodel, caffe.TEST)
+
+# 	# create input layer
+# 	# this actually ends up being c01b shaped if cuda, but we pass in bc01
+# 	#if cuda == False:
+# 	last_layer = inp_layer = layers.InputLayer(tuple(input_dims), name='data')
+# 	#else:
+# 		# this actually ends up being c01b shaped if cuda, but we pass in bc01, so we need to reshuffled
+# 	#	last_layer = inp_layer = layers.InputLayer((input_dims[1], input_dims[2], input_dims[3], input_dims[0]), name='data')
+
+
+# 	# go thru layers and create the theano layer 
+# 	all_layers = [inp_layer]
+# 	swapped = False
+# 	for layer in architecture:
+# 		# if (layer['type'] == 'INNER_PRODUCT' or layer['type'] == 'InnerProduct') and swapped==False and cuda==True:
+# 		# 	# need to add a reshaping layer
+# 		# 	'''
+# 		# 	this might not be needed, check lasagne stuff
+# 		# 	'''
+# 		# 	reshape_layer = cuda_convnet.ShuffleC01BToBC01Layer(last_layer)
+# 		# 	all_layers.append(reshape_layer)
+# 		# 	last_layer = reshape_layer
+# 		# 	swapped = True
+
+# 		this_layer = parse_layer(layer, last_layer)
+# #		if layer['type'].lower() in valid_lrn:
+# #`			break
+# 		if this_layer == -1:
+# 			# error checking
+# 			continue
 		
-		set_params(this_layer, net, layer)
-		last_layer = this_layer
-		all_layers.append(this_layer)
+# 		set_params(this_layer, net, layer)
+# 		last_layer = this_layer
+# 		all_layers.append(this_layer)
 		
-	model = LasagneModel(last_layer)
-	model.compile_forward(nOutputs=0) # 0 returns all layers
-	return model, net, all_layers
+# 	model = LasagneModel(last_layer)
+# 	model.compile_forward(nOutputs=0) # 0 returns all layers
+# 	return model, net, all_layers
 
 
 
@@ -339,38 +398,38 @@ def set_params(theano_layer, net, layer_params):
 		else:
 			print "not a valid layer to set params to (what happened??) %s" % layer_params['type']
 
-def set_conv_params(theano_layer, net, layer_params):
-	name = layer_params['name']
-	W = net.params[name][0].data
-	b = net.params[name][1].data
-	# b needs to just be the last index
-	b = b[0,0,0,:]
-	# W needs to be fixed
-	W = W[:,:,::-1,::-1]
-	theano_layer.W.set_value(W.astype(theano.config.floatX))
-	theano_layer.b.set_value(b.astype(theano.config.floatX))
+# def set_conv_params(theano_layer, net, layer_params):
+# 	name = layer_params['name']
+# 	W = net.params[name][0].data
+# 	b = net.params[name][1].data
+# 	# b needs to just be the last index
+# 	b = b[0,0,0,:]
+# 	# W needs to be fixed
+# 	W = W[:,:,::-1,::-1]
+# 	theano_layer.W.set_value(W.astype(theano.config.floatX))
+# 	theano_layer.b.set_value(b.astype(theano.config.floatX))
 
-def set_cuda_conv_params(theano_layer, net, layer_params):
-	name = layer_params['name']
-	W = net.params[name][0].data
-	b = net.params[name][1].data
-	# b needs to just be the last index
-	b = b[0,0,0,:]
-	# W needs to be reshaped into n_features(from prev layer), size, size, n_filters
-	theano_layer.W.set_value(W.astype(theano.config.floatX))
-	theano_layer.b.set_value(b.astype(theano.config.floatX))
+# def set_cuda_conv_params(theano_layer, net, layer_params):
+# 	name = layer_params['name']
+# 	W = net.params[name][0].data
+# 	b = net.params[name][1].data
+# 	# b needs to just be the last index
+# 	b = b[0,0,0,:]
+# 	# W needs to be reshaped into n_features(from prev layer), size, size, n_filters
+# 	theano_layer.W.set_value(W.astype(theano.config.floatX))
+# 	theano_layer.b.set_value(b.astype(theano.config.floatX))
 
-def set_ip_params(theano_layer, net, layer_params):
-	name = layer_params['name']
-	W = net.params[name][0].data
-	b = net.params[name][1].data
+# def set_ip_params(theano_layer, net, layer_params):
+# 	name = layer_params['name']
+# 	W = net.params[name][0].data
+# 	b = net.params[name][1].data
 
-	# W needs to just be the last 2, shuffled
-	W = W[0,0,:,:].T
-	# b needs to just be the last index
-	b = b[0,0,0,:]
-	theano_layer.W.set_value(W.astype(theano.config.floatX))
-	theano_layer.b.set_value(b.astype(theano.config.floatX))
+# 	# W needs to just be the last 2, shuffled
+# 	W = W[0,0,:,:].T
+# 	# b needs to just be the last index
+# 	b = b[0,0,0,:]
+# 	theano_layer.W.set_value(W.astype(theano.config.floatX))
+# 	theano_layer.b.set_value(b.astype(theano.config.floatX))
 
 
 def parse_layer(layer, last_layer):
@@ -537,15 +596,7 @@ if __name__ == '__main__':
 	parser.add_argument("--caffemodel", default='VGG_ILSVRC_16_layers.caffemodel',help="model binary")
 	args = parser.parse_args()
 
-	model = convert_model_def(args.prototxt)
-	raise
-
-	print 'Converting model...'
-	one,two,a,b = convert(args.prototxt,args.caffemodel)
-	raise
-
-
-	model, net, all_layers = convert(args.prototxt,args.caffemodel)
+	model, net = convert(args.prototxt,args.caffemodel)
 	print 'testing similarity...'
 	random_mat, outlist =test_similarity(model, net)
 	test_serialization(model, random_mat)
