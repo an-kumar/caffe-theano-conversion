@@ -1,4 +1,5 @@
-def parse_caffemodel(prototxt, caffemodel):
+import caffe
+def parse_caffemodel(caffemodel, prototxt):
 	'''
 	parses the caffemodel file using caffe
 	'''

@@ -1,4 +1,5 @@
 from google.protobuf import text_format
+import sys
 import caffe_pb2
 
 
