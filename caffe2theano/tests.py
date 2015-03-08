@@ -77,7 +77,7 @@ def test_similarity(model, net):
 
 
 def test_serialization(model):
-	random_mat = np.random.randn(*(model.input_layer.shape))g
+	random_mat = np.random.randn(*(model.input_layer.shape))
 	print "outlist_1"
 	outlist_1 = model.forward(random_mat)
 	print "dumping..."
