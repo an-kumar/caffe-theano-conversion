@@ -311,7 +311,7 @@ def convert(prototxt, caffemodel, caffe_parse=caffe_parsing):
 	'''
 	lmodel = convert_model_def(prototxt)
 	set_params_from_caffemodel(lmodel, caffemodel, prototxt,caffe_parse=caffe_parse)
-	return model
+	return lmodel
 
 
 if __name__ == '__main__':
