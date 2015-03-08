@@ -101,5 +101,5 @@ def test_serialization(model):
 if __name__ == '__main__':
 	import os
 	proto = os.path.join(os.getcwd(), 'data/VGG_ILSVRC_16_layers_deploy.prototxt')
-	caffe = os.path.join(os.getcwd(), 'data/VGG_ISLVRC_16_layers.caffemodel')
+	caffe = os.path.join(os.getcwd(), 'data/VGG_ILSVRC_16_layers.caffemodel')
 	main (proto, caffe)
