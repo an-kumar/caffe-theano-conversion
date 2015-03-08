@@ -284,23 +284,23 @@ def set_conv_params(layer, W,b):
 	b = b[0,0,0,:]
 	# W needs to be fixed
 	W = W[:,:,::-1,::-1]
-	theano_layer.W.set_value(W.astype(theano.config.floatX))
-	theano_layer.b.set_value(b.astype(theano.config.floatX))
+	layer.W.set_value(W.astype(theano.config.floatX))
+	layer.b.set_value(b.astype(theano.config.floatX))
 
 def set_cuda_conv_params(layer,W,b):
 	# b needs to just be the last index
 	b = b[0,0,0,:]
 	# W needs to be reshaped into n_features(from prev layer), size, size, n_filters
-	theano_layer.W.set_value(W.astype(theano.config.floatX))
-	theano_layer.b.set_value(b.astype(theano.config.floatX))
+	layer.W.set_value(W.astype(theano.config.floatX))
+	layer.b.set_value(b.astype(theano.config.floatX))
 
 def set_ip_params(layer,W,b):
 	# W needs to just be the last 2, shuffled
 	W = W[0,0,:,:].T
 	# b needs to just be the last index
 	b = b[0,0,0,:]
-	theano_layer.W.set_value(W.astype(theano.config.floatX))
-	theano_layer.b.set_value(b.astype(theano.config.floatX))
+	layer.W.set_value(W.astype(theano.config.floatX))
+	layer.b.set_value(b.astype(theano.config.floatX))
 
 
 
