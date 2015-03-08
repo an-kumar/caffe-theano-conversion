@@ -18,7 +18,7 @@ def main(prototxt, caffemodel):
 	model = None
 	try:
 		import caffe
-		net = Caffe.Net(prototxt,caffemodel,caffe.TEST)
+		net = caffe.Net(prototxt,caffemodel,caffe.TEST)
 		test_string += printt('Accuracy of conversion - caffe parsing')
 		model = conversion.convert(prototxt,caffemodel,caffe_parse=True)
 		l2_distance = test_similarity(model,net)
@@ -35,7 +35,8 @@ def main(prototxt, caffemodel):
 			prints('Accuracy of conversion - protobuf parsing: Passed')
 		else:
 			prints('Accuracy of conversion - protobuf parsing: Failed')
-	except:
+	except Exception as e:
+		print e
 		test_string += printe('Caffe was not found. Continuing...')
 
 	test_string += printt('Serialization')
@@ -76,7 +77,7 @@ def test_similarity(model, net):
 
 
 def test_serialization(model):
-	random_mat = np.random.randn(*model.input_layer.shape)
+	random_mat = np.random.randn(*(model.input_layer.shape))
 	print "outlist_1"
 	outlist_1 = model.forward(random_mat)
 	print "dumping..."
