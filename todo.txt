@@ -6,3 +6,11 @@ TODO:
 4. support caffe installation because it's quicker
 5. solvers, solver states, etc (make a class 'solver', lasagne probably has something like this already)
 6. work with datasets
+conv layer pad?
+dropout layer
+
+
+WHAT I DID:
+1. pylearn2 change (sparse connectivity, group), 2 changes
+2. download google buffers, wget caffe.proto
+3. protoc -I=. --python_out=. ./caffe.proto
