@@ -77,7 +77,7 @@ def test_similarity(model, net):
 
 
 def test_serialization(model):
-	random_mat = np.random.randn(*(model.input_layer.shape))
+	random_mat = np.random.randn(*(model.input_layer.shape))g
 	print "outlist_1"
 	outlist_1 = model.forward(random_mat)
 	print "dumping..."
@@ -99,4 +99,7 @@ def test_serialization(model):
 	return True
 
 if __name__ == '__main__':
-	main('data/VGG_ILSVRC_16_layers_deploy.prototxt', 'data/VGG_ISLVRC_16_layers.caffemodel')
+	import os
+	proto = os.path.join(os.getcwd(), 'data/VGG_ILSVRC_16_layers_deploy.prototxt')
+	caffe = os.path.join(os.getcwd(), 'data/VGG_ISLVRC_16_layers.caffemodel')
+	main (proto, caffe)
