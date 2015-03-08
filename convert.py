@@ -237,20 +237,13 @@ def set_params_from_caffemodel(lasagne_model, caffemodel):
 
 	# this should be in the same order as was made by the lasagne model, but reversed. we will check that.
 	# todo: maybe just go by names, strictly? 
-	assert len(layer_params) == len(lasagne_model.all_layers)
-	for i in range(len(layer_params[::-1])):
-		lp = layer_params[::-1][i]
-		lasagne_layer = lasagne_model.all_layers[i]
-
-		if len(lasasgne_layer.get_params()) == 0:
+	for lasagne_layer in lasagne_model.all_layers:
+		if len(lasagne_layer.get_params()) == 0:
 			# no params to set
 			continue
-		if lp.name == lasagne_layer.name:
-			print "Names match!"
-		else:
-			print "maybe a problem. Names don't match. Continuing anyways."
-		Wblob = lp.blobs[0]
-		bblob = lp.blobs[1]
+		lp = layer_params[lasagne_layer.name]
+		Wblob = lp[0]
+		bblob = lp[1]
 		# get arrays of parameters
 		W = array_from_blob(Wblob)
 		b = array_from_blob(bblob)

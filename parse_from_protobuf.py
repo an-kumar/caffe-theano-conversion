@@ -88,7 +88,7 @@ def parse_caffemodel(filepath):
 
 	filepath: /path/to/trained-model.caffemodel
 
-	returns: the layerparameter objects, in order
+	returns: a dict mapping layer name -> layer blobs
 	'''
 	f = open(filepath)
 	contents = f.read()
@@ -96,8 +96,12 @@ def parse_caffemodel(filepath):
 	netparam = caffe_pb2.NetParameter()
 	netparam.ParseFromString(contents)
 
-	return find_layers(netparam)
+	layers = find_layers(netparam)
+	param_dict = {} # goes name -> parameter. TODO: something else?
+	for layer in layers:
+		param_dict[layer.name] = layer.blobs
 
+	return param_dict
 
 
 
