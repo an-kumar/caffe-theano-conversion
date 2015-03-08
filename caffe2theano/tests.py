@@ -40,7 +40,7 @@ def main(prototxt, caffemodel):
 		test_string += printe('Caffe was not found. Continuing...')
 
 	test_string += printt('Serialization')
-	if model is not None:
+	if model is None:
 		model = conversion.convert(prototxt,caffemodel)
 	success = test_serialization(model)
 	if success:
