@@ -102,7 +102,9 @@ def test_serialization(model):
 	return True
 
 if __name__ == '__main__':
-	import os
-	proto = os.path.join(os.getcwd(), 'data/VGG_ILSVRC_16_layers_deploy.prototxt')
-	caffe = os.path.join(os.getcwd(), 'data/VGG_ILSVRC_16_layers.caffemodel')
-	main (proto, caffe)
+	import argparse
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--prototxt", default='data/VGG_ILSVRC_16_layers_deploy.prototxt', help="model definition file")
+	parser.add_argument("--caffemodel", default='data/VGG_ILSVRC_16_layers.caffemodel',help="model binary")
+	args = parser.parse_args()
+	main (args.prototxt, args.caffemodel)
