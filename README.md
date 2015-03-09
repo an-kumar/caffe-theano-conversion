@@ -16,7 +16,12 @@ You can also load in a mean file using conversion's convert_mean_file function. 
 Right now, you have to put the cost layer on yourself, as well as do the backprop code. This is a future step for me, however, Lasagne is very easy to use and you can learn how to add your own stuff very easily. I want to keep this as configurable as possible because that's the benefit of theano.
 
 ## DEPENDENCIES:
-Theano (http://deeplearning.net/software/theano/), Lasagne (https://github.com/benanne/Lasagne), Google protobuf. Pylearn2 for cuda convnet wrappers (see below). If you have Caffe installed, you already have google protobuf, otherwise see here: https://code.google.com/p/protobuf/
+Theano (http://deeplearning.net/software/theano/) needs to be bleeding-edge:
+```
+pip install --upgrade --no-deps git+git://github.com/Theano/Theano.git
+```
+
+Lasagne (https://github.com/benanne/Lasagne), Google protobuf. Pylearn2 for cuda convnet wrappers (see below). If you have Caffe installed, you already have google protobuf, otherwise see here: https://code.google.com/p/protobuf/
 
 ##USING CUDA CONVNET WRAPPERS:
 
