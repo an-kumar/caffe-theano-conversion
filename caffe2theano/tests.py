@@ -2,6 +2,7 @@ import conversion
 import os
 import theano
 import numpy as np
+from models import *
 
 def printt(string):
 	print "====== [ TESTING: %s ] ======" % string
@@ -59,14 +60,14 @@ def main(prototxt, caffemodel):
 def test_similarity(model, net):
 	inp_shape= net.blobs['data'].data.shape
 	random_mat = np.random.randn(*inp_shape).astype(theano.config.floatX) 
-	tick = time.time()
+	
 	fprop = net.forward(**{net.inputs[0]:random_mat})
 	print fprop[fprop.keys()[0]].shape
-	tock = time.time()
+	
 	print 'time: %s' % str(tock - tick)
-	tick = time.time()
+	
 	outlist = model.forward(random_mat)
-	tock = time.time()
+	
 	print 'model forward'
 	print 'time: %s' % str(tock - tick)
 	# print fprop vs outlist
