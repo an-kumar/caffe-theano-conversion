@@ -26,18 +26,18 @@ def main(prototxt, caffemodel):
 		model = conversion.convert(prototxt,caffemodel,caffe_parse=True)
 		l2_distance = test_similarity(model,net)
 		if l2_distance < 1e-7:
-			prints('Accuracy of conversion - caffe parsing: Passed')
+			test_string += prints('Accuracy of conversion - caffe parsing: Passed')
 		else:
-			prints('Accuracy of conversion - caffe parsing: Failed')
+			test_string += prints('Accuracy of conversion - caffe parsing: Failed')
 
 		del model
 		test_string += printt('Accuracy of conversion - protobuf parsing')
 		model = conversion.convert(prototxt,caffemodel,caffe_parse=False)
 		l2_distance = test_similarity(model,net)
 		if l2_distance < 1e-7:
-			prints('Accuracy of conversion - protobuf parsing: Passed')
+			test_string += prints('Accuracy of conversion - protobuf parsing: Passed')
 		else:
-			prints('Accuracy of conversion - protobuf parsing: Failed')
+			test_string += prints('Accuracy of conversion - protobuf parsing: Failed')
 	except Exception as e:
 		print e
 		test_string += printe('Caffe was not found. Continuing...')
