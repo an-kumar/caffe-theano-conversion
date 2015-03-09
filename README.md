@@ -10,6 +10,9 @@ Currently, the following caffe layers are supported:
 	* Inner Product
 	* Relu
 
+## DEPENDENCIES:
+Theano, Lasagne. Pylearn2 for cuda convnet wrappers (see below).
+
 ##USING CUDA CONVNET WRAPPERS:
 
 The cuda-convnet wrappers in pylearn2 are much faster than the GPU implementations of convolutions in Theano. Lasagne has cuda-convnet layers, and I have created a caffe version of these layers. However, they require you to go into pylearn2 and change some of the files. I don't know what the best way to package that change in this repo is, so until someone tells me a better way I'll just describe what to do:
