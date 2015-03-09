@@ -249,7 +249,7 @@ def conv_layer(layer, last_layer):
 		print "pretty sure this won't work but we'll try a full conv"
 		border_mode = 'full'
 	if group > 1:
-		conv = extra_convnet_layers.CaffeConv2DLayer(last_layer, group=group,num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity,name=name)
+		conv = extra_layers.CaffeConv2DLayer(last_layer, group=group,num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity,name=name)
 	else:
 		conv = layers.Conv2DLayer(last_layer, num_filters=num_filters, filter_size=filter_size, strides=strides, border_mode=border_mode, nonlinearity=nonlinearity,name=name)
 	return conv
