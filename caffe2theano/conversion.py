@@ -80,13 +80,48 @@ valid_pooling = set(['pooling'])
 valid_softmax = set(['softmax'])
 valid_dropout = set(['dropout'])
 
+# ======= [ FUNCTIONS THAT YOU MIGHT USE: ] ========= #
+def convert_trained_caffemodel(lasagne_model, caffemodel, prototxt='', caffe_parse = caffe_parsing):
+	'''
+	PARAMETERS:
+		- lasagne_model: A lasagne model (i.e, BaseModel) to set parameters of. This probably came from a call to
+		convert_model_def. The layers should be named the same as the caffemodel.
+		- caffemodel: /path/to/trained_model.caffemodel file
+		- prototxt: /path/to/deploy.prototxt file. This is not needed if you don't use the caffe parsing, otherwise it's needed.
+		- caffe_parse: don't worry about this, it will be set based on whether or not you have caffe installed.
+
+	NOTES:
+	sets the params of lasagne_model to be from the trained caffemodel.
+	'''
+	# load in the caffemodel (this takes a long time without cpp implementation of protobuf)
+	if caffe_parse:
+		layer_params = parse_from_protobuf_caffe.parse_caffemodel(caffemodel, prototxt=prototxt) # prototxt is passed in if caffemodel uses caffe
+	else:
+		layer_params = parse_from_protobuf.parse_caffemodel(caffemodel)
+
+	# this should be in the same order as was made by the lasagne model, but reversed. we will check that.
+	# todo: maybe just go by names, strictly? 
+	for lasagne_layer in lasagne_model.all_layers:
+		if len(lasagne_layer.get_params()) == 0:
+			# no params to set
+			continue
+		lp = layer_params[lasagne_layer.name]
+		Wblob = lp[0]
+		bblob = lp[1]
+		# get arrays of parameters
+		W = array_from_blob(Wblob)
+		b = array_from_blob(bblob)
+		# set parameters
+		set_model_params(lasagne_layer, W,b)
 
 
 def convert_model_def(prototxt):
 	'''
-	prototxt is a model definition .prototxt file
+	PARAMETERS:
+		- prototxt: /path/to/deploy.prototxt file
 
-	returns a lasagne model with the layers, correct initialized
+	NOTES:
+	returns a lasagne model with the correct layers
 	'''
 	name, inp, architecture = parse_model_def(prototxt)
 	inp_name, inp_dims = inp
@@ -100,6 +135,36 @@ def convert_model_def(prototxt):
 	# make the lasagne model (only need last layer)
 	model = BaseModel(last_layer)
 	return model
+
+
+def convert(prototxt, caffemodel, caffe_parse=caffe_parsing):
+	'''
+	PARAMETERS:
+		-prototxt: /path/to/deploy.prototxt file
+		-caffemodel: /path/to/trained_model.caffemodel file
+		-caffe_parse: don't worry about this
+
+	NOTES:
+	wraps the two methods above to return a lasagne model with the correct parameters.
+	'''
+	lmodel = convert_model_def(prototxt)
+	convert_trained_caffemodel(lmodel, caffemodel, prototxt,caffe_parse=caffe_parse)
+	return lmodel
+
+def convert_mean_image(binaryproto):
+	'''
+	PARAMETERS:
+		-binaryproto: /path/to/mean_iamge.binaryproto
+
+	NOTES:
+	returns a numpy array of the mean image given by the binaryproto file.
+	'''
+	return parse_from_protobuf.parse_mean_file(binaryproto)
+
+
+
+
+# ===== [ HELPERS ] ===== #
 
 def parse_layer_from_param(layer,last_layer):
 	'''
@@ -232,7 +297,7 @@ def softmax_layer(layer, last_layer):
 	return extra_layers.SoftmaxLayer(last_layer, name=name)
 
 
-def set_params_from_caffemodel(lasagne_model, caffemodel, prototxt='', caffe_parse = caffe_parsing):
+def convert_trained_caffemodel(lasagne_model, caffemodel, prototxt='', caffe_parse = caffe_parsing):
 	'''
 	sets the params of lasagne_model to be from the trained caffemodel.
 
@@ -300,23 +365,6 @@ def set_ip_params(layer,W,b):
 	b = b[0,0,0,:]
 	layer.W.set_value(W.astype(theano.config.floatX))
 	layer.b.set_value(b.astype(theano.config.floatX))
-
-
-
-
-def convert(prototxt, caffemodel, caffe_parse=caffe_parsing):
-	'''
-	wrapper around the two functions above
-	'''
-	lmodel = convert_model_def(prototxt)
-	set_params_from_caffemodel(lmodel, caffemodel, prototxt,caffe_parse=caffe_parse)
-	return lmodel
-
-def convert_mean_image(binaryproto):
-	'''
-	converts the mean image file into a numpy array
-	'''
-	return parse_from_protobuf.parse_mean_file(binaryproto)
 
 
 if __name__ == '__main__':
