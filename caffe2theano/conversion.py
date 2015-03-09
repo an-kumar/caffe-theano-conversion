@@ -335,11 +335,14 @@ def set_model_params(lasagne_layer,W,b):
 	if cuda:
 		if isinstance(lasagne_layer, cuda_convnet.Conv2DCCLayer):
 			set_cuda_conv_params(lasagne_layer, W,b)
+			return
 
 	if isinstance(lasagne_layer, layers.Conv2DLayer):
 		set_conv_params(lasagne_layer,W,b)
+		return
 	elif isinstance(lasagne_layer, layers.DenseLayer):
 		set_ip_params(lasagne_layer, W,b)
+		return
 	else:
 		raise Exception ("don't know this layers: %s" % type(lasagne_layer))
 
