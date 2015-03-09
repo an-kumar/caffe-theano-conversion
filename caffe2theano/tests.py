@@ -64,12 +64,12 @@ def test_similarity(model, net):
 	fprop = net.forward(**{net.inputs[0]:random_mat})
 	print fprop[fprop.keys()[0]].shape
 	
-	print 'time: %s' % str(tock - tick)
+	
 	
 	outlist = model.forward(random_mat)
 	
 	print 'model forward'
-	print 'time: %s' % str(tock - tick)
+	
 	# print fprop vs outlist
 	print 'L2 distance between output of caffe and output of theano'
 	print np.sum((fprop[fprop.keys()[0]][:,:,0,0] - outlist[0])**2)
