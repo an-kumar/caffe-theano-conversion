@@ -7,6 +7,7 @@ from models import *
 # see if GPU + pylearn2 is available for the cuda convnet wrappers
 try:
 	from  caffe_layers import extra_convnet_layers
+	from lasagne.layers import cuda_convnet
 	print "===============\n"*5
 	print "using cuda convnet wrappers"
 	print "===============\n"*5
