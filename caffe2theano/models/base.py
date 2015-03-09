@@ -46,7 +46,7 @@ class BaseModel(object):
 		# get symbolic input from layer
 		symbolic_input = self.input_layer.input_var
 		# make list of outputs
-		outputs = [lay.get_output() for lay in self.all_layers[-nOutputs:]]
+		outputs = [lay.get_output() for lay in self.all_layers[:nOutputs]]
 		# store function in self.forward
 		self.forward = theano.function([symbolic_input], outputs)
 
