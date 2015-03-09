@@ -312,6 +312,12 @@ def convert(prototxt, caffemodel, caffe_parse=caffe_parsing):
 	set_params_from_caffemodel(lmodel, caffemodel, prototxt,caffe_parse=caffe_parse)
 	return lmodel
 
+def convert_mean_image(binaryproto):
+	'''
+	converts the mean image file into a numpy array
+	'''
+	return parse_from_protobuf.parse_mean_file(binaryproto)
+
 
 if __name__ == '__main__':
 	import argparse

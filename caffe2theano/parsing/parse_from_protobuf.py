@@ -105,6 +105,19 @@ def parse_caffemodel(filepath):
 	return param_dict
 
 
+def parse_mean_file(filepath):
+	'''
+	parses an image mean file given a filepath
+	returns: a numpy array representing the mean image
+	'''
+	tp = caffe_pb2.TransformParameter()
+	f = open(filepath)
+	contents = f.read()
+
+	tp.ParseFromString(contents)
+	return np.array(tp.mean_value).reshape((3, tp.crop_size,tp.crop_size))
+
+
 
 
 

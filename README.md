@@ -11,6 +11,8 @@ Currently, the following caffe layers are supported:
 	* Relu
 	* Softmax
 
+You can also load in a mean file using conversion's convert_mean_file function. Future work is to put that in the conversion of net architectures itself, which might have a data layer with transformparameter. That can be automated.
+
 Right now, you have to put the cost layer on yourself, as well as do the backprop code. This is a future step for me, however, Lasagne is very easy to use and you can learn how to add your own stuff very easily. I want to keep this as configurable as possible because that's the benefit of theano.
 
 ## DEPENDENCIES:
