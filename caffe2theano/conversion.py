@@ -243,7 +243,7 @@ def set_params_from_caffemodel(lasagne_model, caffemodel, prototxt='', caffe_par
 	if caffe_parse:
 		layer_params = parse_from_protobuf_caffe.parse_caffemodel(caffemodel, prototxt=prototxt) # prototxt is passed in if caffemodel uses caffe
 	else:
-		layer_params = parse_from_protobuf.parse_caffmodel(caffemodel)
+		layer_params = parse_from_protobuf.parse_caffemodel(caffemodel)
 
 	# this should be in the same order as was made by the lasagne model, but reversed. we will check that.
 	# todo: maybe just go by names, strictly? 
