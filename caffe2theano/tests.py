@@ -1,6 +1,8 @@
 import conversion
 import os
+import theano
 import numpy as np
+
 def printt(string):
 	print "====== [ TESTING: %s ] ======" % string
 	return "====== [ TESTING: %s ] ======\n" % string

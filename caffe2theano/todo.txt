@@ -1,5 +1,5 @@
 TODO:
-
+1. better serialization
 2. decompose tests correctly into different file so that python test.py or something does all of them
 3. support no caffe installation
 4. support caffe installation because it's quicker

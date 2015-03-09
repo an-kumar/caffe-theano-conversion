@@ -3,8 +3,7 @@ import numpy as np
 import time
 import theano.tensor as T
 from caffe_layers import extra_layers
-from models import BaseModel
-import models.utils
+from models import *
 # see if GPU + pylearn2 is available for the cuda convnet wrappers
 try:
 	from  caffe_layers import extra_convnet_layers
