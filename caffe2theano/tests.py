@@ -80,7 +80,7 @@ def test_similarity(model, net):
 
 
 def test_serialization(model):
-	random_mat = np.random.randn(*(model.input_layer.shape))
+	random_mat = np.random.randn(*(model.input_layer.shape)).astype(theano.config.floatX)
 	print "outlist_1"
 	outlist_1 = model.forward(random_mat)
 	print "dumping..."
