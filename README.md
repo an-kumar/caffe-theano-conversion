@@ -53,6 +53,7 @@ else:
 
 You should be able to not have that if statement at all, but I kept it in.
 
+## USAGE:
 You can test the repo by python tests.py.
 All the tests should pass, but **terminal is out of GPUs, so I haven't been able to run the tests.py script on GPU**. However, I have used this repo with GPUs, and it worked, the only question is if it still works after I moved files around. If it doesn't let me know.
 
