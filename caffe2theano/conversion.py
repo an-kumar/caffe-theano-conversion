@@ -170,7 +170,11 @@ def parse_layer_from_param(layer,last_layer):
 	'''
 	returns the correct layer given the param dict
 	'''
-	tp = V1Map[layer.type].lower()
+	if type(layer.type) == int:
+		# this is the legacy caffe thing
+		tp = V1Map[layer.type].lower()
+	else:
+		tp = layer.type.lower()
 
 	if tp in valid_convolution:
 		if cuda==True:
