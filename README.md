@@ -3,11 +3,12 @@
 This is a repository that allows you to convert pretrained caffe models into models in Lasagne, a thin wrapper around Theano. You can also convert a caffe model's architecture to an equivalent one in Lasagne. You do not need caffe installed to use this module.
 
 Currently, the following caffe layers are supported:
-	- Convolution
-	- LRN
-	- Pooling
-	- Inner Product
-	- Relu
+
+	* Convolution
+	* LRN
+	* Pooling
+	* Inner Product
+	* Relu
 
 ##USING CUDA CONVNET WRAPPERS:
 
