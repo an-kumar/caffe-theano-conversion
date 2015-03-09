@@ -35,7 +35,25 @@ python setup.py develop
 
 The cuda-convnet wrappers in pylearn2 are much faster than the GPU implementations of convolutions in Theano. Lasagne has cuda-convnet layers, and I have created a caffe version of these layers. However, they require you to go into pylearn2 and change some of the files. I don't know what the best way to package that change in this repo is, so until someone tells me a better way I'll just describe what to do:
 
-In this file: https://github.com/lisa-lab/pylearn2/blob/master/pylearn2/sandbox/cuda_convnet/base_acts.py, add a argument group=1 to the __init__ function of BaseActs. In the __init__ function, change:
+In this file: https://github.com/lisa-lab/pylearn2/blob/master/pylearn2/sandbox/cuda_convnet/base_acts.py, change:
+```
+class BaseActs(GpuOp):
+    """
+    Shared code for wrapping various convnet operations.
+    """
+    def __init__(self, pad=0, partial_sum=None, stride=1):
+```
+to:
+```
+class BaseActs(GpuOp):
+    """
+    Shared code for wrapping various convnet operations.
+    """
+    def __init__(self, pad=0, partial_sum=None, stride=1, group=1):
+```
+
+Then, in that init function, change:
+
 ```
 self.dense_connectivity = True
 ```
