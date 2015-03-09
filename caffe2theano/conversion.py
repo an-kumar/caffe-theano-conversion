@@ -22,7 +22,7 @@ from parsing import parse_from_protobuf
 try:
 	from parsing import parse_from_protobuf_caffe
 	caffe_parsing = True
-except:
+except ImportError as e:
 	print "no caffe found; parsing will be done from google protobuf (slower)"
 	from parsing import parse_from_protobuf
 	caffe_parsing=False
