@@ -1,6 +1,7 @@
 '''
 This script reads in the BVLC reference network and feature extracts from all the MIT scene data.
 '''
+import skimage.transform
 import os
 import argparse
 import sys
@@ -12,7 +13,8 @@ import numpy as np
 
 lmodel = caffe2theano.conversion.convert(prototxt='/root/caffe/models/bvlc_reference_caffenet/deploy.prototxt', caffemodel='/root/caffe/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel')
 mean_image = caffe2theano.conversion.convert_mean_image('/root/caffe/data/ilsvrc12/imagenet_mean.binaryproto')
-
+mean_image = skimage.transform.resize(mean_image, (3,227,227))
+print mean_image.shape
 base_dir = '/root/proj/Images/'
 out_dir = '/root/proj/MIT_dumped'
 parser = argparse.ArgumentParser()
@@ -57,7 +59,7 @@ for split in ['train', 'test']:
 		arr_list = [process_single_file(f) for f in files]
                 arr_list = [x for x in arr_list if x is not None]
                 all_arrs += arr_list
-                y_list = [y for i in range(len(files))]
+                y_list = [y for i in range(len(arr_list))]
                 all_ys += y_list
 		# arr_list is a list of files. we need to turn them into batches of for the reference caffenet
 
@@ -75,7 +77,7 @@ for split in ['train', 'test']:
 		all_ys += spl
 
 	outs = [lmodel.forward(spl)[0] for spl in split_all_arrs[:-1]]
-	total_tensor = np.concatentate(outs, axis=0)
+	total_tensor = np.concatenate(outs, axis=0)
 	total_y = np.array(all_ys)
 	print total_tensor.shape
 	print total_y.shape
