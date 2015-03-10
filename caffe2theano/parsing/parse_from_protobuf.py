@@ -110,7 +110,7 @@ def parse_mean_file(filepath):
 	parses an image mean file given a filepath
 	returns: a numpy array representing the mean image
 	'''
-	tp = caffe_pb2.TransformParameter()
+	tp = caffe_pb2.TransformationParameter()
 	f = open(filepath)
 	contents = f.read()
 

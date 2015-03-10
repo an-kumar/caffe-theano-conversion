@@ -10,7 +10,7 @@ import skimage.io
 import numpy as np
 
 
-lmodel = caffe2theano.conversion.convert(prototxt='/root/caffe/models/bvlc_reference_caffenet/deploy.prototxt', caffemodel='/root/caffe/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel')
+#lmodel = caffe2theano.conversion.convert(prototxt='/root/caffe/models/bvlc_reference_caffenet/deploy.prototxt', caffemodel='/root/caffe/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel')
 mean_image = caffe2theano.conversion.convert_mean_image('/root/caffe/data/ilsvrc12/imagenet_mean.binaryproto')
 
 base_dir = '/root/proj/Images/'
