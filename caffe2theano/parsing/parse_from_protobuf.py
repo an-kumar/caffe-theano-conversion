@@ -1,4 +1,5 @@
 from google.protobuf import text_format
+import numpy as np
 import sys
 import caffe_pb2
 

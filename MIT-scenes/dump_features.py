@@ -30,7 +30,7 @@ def process_single_image(X):
 	X = skimage.transform.resize(X, mean_image.shape)
 	# subtract mean image
 	X = X - mean_image
-	return X
+	return X.astype(np.float32)
 
 def process_single_file(filename):
 	X = skimage.io.imread(filename)
@@ -69,7 +69,7 @@ for split in ['train', 'test']:
 # import pickle
 # pickle.dump(l2i, open(os.path.join(out_dir, 'label_to_index'),'w'))
 	split_all_arrs= [all_arrs[i*10:(i+1)*10] for i in range((len(all_arrs)/10)+1)]
-	split_all_ys = [all_ys[i*10:(i+1)*10] i in range((len(all_ys)/10)+1)]
+	split_all_ys = [all_ys[i*10:(i+1)*10] for i in range((len(all_ys)/10)+1)]
 	all_ys = []
 	for spl in split_all_ys[:-1]:
 		all_ys += spl
