@@ -10,7 +10,7 @@ import skimage.io
 import numpy as np
 
 
-#lmodel = caffe2theano.conversion.convert(prototxt='/root/caffe/models/bvlc_reference_caffenet/deploy.prototxt', caffemodel='/root/caffe/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel')
+lmodel = caffe2theano.conversion.convert(prototxt='/root/caffe/models/bvlc_reference_caffenet/deploy.prototxt', caffemodel='/root/caffe/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel')
 mean_image = caffe2theano.conversion.convert_mean_image('/root/caffe/data/ilsvrc12/imagenet_mean.binaryproto')
 
 base_dir = '/root/proj/Images/'
@@ -45,9 +45,10 @@ if len(i2l) != 67:
 l2i = {i2l[i]:i for i in range(len(i2l))}
 
 # now dump
-all_arrs = []
-all_ys= []
-for split in ['train','test']:
+
+for split in ['train', 'test']:
+	all_arrs = []
+	all_ys= []
 	full_dir = os.path.join(base_dir,split)
 	for label in os.listdir(full_dir):
 		y = l2i[label]
@@ -67,7 +68,18 @@ for split in ['train','test']:
 
 # import pickle
 # pickle.dump(l2i, open(os.path.join(out_dir, 'label_to_index'),'w'))
-print len(all_arrs)
-print len(all_ys)
+	split_all_arrs= [all_arrs[i*10:(i+1)*10] for i in range((len(all_arrs)/10)+1)]
+	split_all_ys = [all_ys[i*10:(i+1)*10] i in range((len(all_ys)/10)+1)]
+	all_ys = []
+	for spl in split_all_ys[:-1]:
+		all_ys += spl
 
+	outs = [lmodel.forward(spl)[0] for spl in split_all_arrs[:-1]]
+	total_tensor = np.concatentate(outs, axis=0)
+	total_y = np.array(all_ys)
+	print total_tensor.shape
+	print total_y.shape
+
+	np.save(os.path.join(out_dir,'X_%s' % (split)), total_tensor)
+	np.save(os.path.join(out_dir,'y_%s' % (split)), total_y)
 
