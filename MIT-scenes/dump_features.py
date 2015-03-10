@@ -76,8 +76,11 @@ for split in ['train', 'test']:
 	for spl in split_all_ys[:-1]:
 		all_ys += spl
 
-	outs_fc7 = [lmodel.forward(spl)[2] for spl in split_all_arrs[:-1]]
-	outs_fc6 = [lmodel.forward(spl)[5] for spl in split_all_arrs[:-1]]
+	outs = [lmodel.forward(spl) for spl in split_all_arrs[:-1]]
+
+
+	outs_fc7 = [out[2] for out in outs]
+	outs_fc6 = [out[5] for out in outs]
 	print lmodel.all_layers[5]
 	print lmodel.all_layers[2]
 
