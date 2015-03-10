@@ -76,12 +76,18 @@ for split in ['train', 'test']:
 	for spl in split_all_ys[:-1]:
 		all_ys += spl
 
-	outs = [lmodel.forward(spl)[0] for spl in split_all_arrs[:-1]]
-	total_tensor = np.concatenate(outs, axis=0)
+	outs_fc7 = [lmodel.forward(spl)[2] for spl in split_all_arrs[:-1]]
+	outs_fc6 = [lmodel.forward(spl)[5] for spl in split_all_arrs[:-1]]
+	print lmodel.all_layers[5]
+	print lmodel.all_layers[2]
+
+	total_tensor_fc7 = np.concatenate(outs_fc7, axis=0)
+	total_tensor_fc6 = np.concatentate(outs_fc6, axis=0)
 	total_y = np.array(all_ys)
 	print total_tensor.shape
 	print total_y.shape
 
-	np.save(os.path.join(out_dir,'X_%s' % (split)), total_tensor)
+	np.save(os.path.join(out_dir,'X_%s_fc7' % (split)), total_tensor_fc7)
+	np.save(os.path.join(out_dir,'X_%s_fc6' % (split)), total_tensor_fc6)
 	np.save(os.path.join(out_dir,'y_%s' % (split)), total_y)
 

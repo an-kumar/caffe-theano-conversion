@@ -42,7 +42,7 @@ class BaseModel(object):
 		Currently, this just compiles the forward pass (used for transfer learning without finetuning)
 		'''
 		self.compile_kwargs = kwargs
-		nOutputs = kwargs.get('nOutputs', 1)
+		nOutputs = kwargs.get('nOutputs', 9)
 		# get symbolic input from layer
 		symbolic_input = self.input_layer.input_var
 		# make list of outputs
