@@ -217,7 +217,7 @@ class CaffeLocalResponseNormalization2DLayer(layers.Layer):
 
     def get_output_for(self, input, *args, **kwargs):
         input_shape = self.input_shape
-        if True:
+        if any(s is None for s in input_shape):
             input_shape = input.shape
         half_n = self.n // 2
         input_sqr = T.sqr(input)
