@@ -47,12 +47,15 @@ for split in ['train','test']:
 		y = l2i[label]
 		files = os.listdir(os.path.join(full_dir,label))
 		arr_list = [process_single_file(f) for f in files]
-		y_arr = np.array([y for i in range(len(files))])
-		tensor = np.array(arr_list) #4d tensor
-		np.save(os.path.join(out_dir,'X_%s_%s' % (label,split)), tensor)
-		np.save(os.path.join(out_dir,'y_%s_%s' % (label,split)), y_arr)
+		print len(arr_list)
+		# arr_list is a list of files. we need to turn them into batches of for the reference caffenet
 
-import pickle
-pickle.dump(l2i, open(os.path.join(out_dir, 'label_to_index'),'w'))
+# 		# y_arr = np.array([y for i in range(len(files))])
+# 		# tensor = np.array(arr_list) #4d tensor
+# 		# np.save(os.path.join(out_dir,'X_%s_%s' % (label,split)), tensor)
+# 		# np.save(os.path.join(out_dir,'y_%s_%s' % (label,split)), y_arr)
+
+# import pickle
+# pickle.dump(l2i, open(os.path.join(out_dir, 'label_to_index'),'w'))
 
 
