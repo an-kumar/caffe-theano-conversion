@@ -85,9 +85,10 @@ for split in ['train', 'test']:
 	print lmodel.all_layers[2]
 
 	total_tensor_fc7 = np.concatenate(outs_fc7, axis=0)
-	total_tensor_fc6 = np.concatentate(outs_fc6, axis=0)
+	total_tensor_fc6 = np.concatenate(outs_fc6, axis=0)
 	total_y = np.array(all_ys)
-	print total_tensor.shape
+	print total_tensor_fc7.shape
+        print total_tensor_fc6.shape
 	print total_y.shape
 
 	np.save(os.path.join(out_dir,'X_%s_fc7' % (split)), total_tensor_fc7)
