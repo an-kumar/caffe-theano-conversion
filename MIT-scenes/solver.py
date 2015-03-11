@@ -173,22 +173,12 @@ class SGDMomentumSolver(BaseSolver):
 		# add dataset givens
 		# todo: is "batch_index" not general enough?
 		batch_index = T.iscalar('batch')
-		dsgivens = dataset.train_givens()
-		for ds in dsgivens:
-			print dsgivens[ds]
-			print ds.type
+		
 		solver_givens.update(dataset.train_givens(batch_index, batch_size))
 
 		# compile function
 		# todo: obj loss?
-		for upd1,upd2 in updates:
-			print upd1
-			print upd2
-			print upd1.type
-			print upd2.type
-                for key in solver_givens:
-                    print key.type
-                    print solver_givens[key]
+		
 		func = theano.function([batch_index], obj_loss, updates=updates, givens=solver_givens)
 		if model.pred_func is not None:
 			test_func = theano.function([], model.pred_func, givens=dataset.test_givens())
