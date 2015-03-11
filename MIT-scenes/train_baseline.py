@@ -26,7 +26,7 @@ class GatedMultipleInputsLayer(layers.MultipleInputsLayer):
 	'''
 	A layer that takes in multiple inputs *of the same dimensionality* and computes gates to combine them
 	'''
-	def __init__(self, incomings, Ws=Eye(), bs = init.Constant(0.), nonlinearity=nonlinearities.sigmoid, **kwargs):
+	def __init__(self, incomings, Ws=init.Uniform(), bs = init.Constant(0.), nonlinearity=nonlinearities.sigmoid, **kwargs):
 		super(GatedMultipleInputsLayer,self).__init__(incomings,**kwargs)
 		num_out = self.input_shapes[0][1]
 		# make gates
