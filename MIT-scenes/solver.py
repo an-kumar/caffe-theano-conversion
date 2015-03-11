@@ -77,6 +77,8 @@ class MultipleInputDataset(object):
 		self.X_batch_var = self.get_X_batch_var(X_trains)
 		self.y_batch_var = self.get_y_batch_var(y_train)
 
+		self.train_size = self.y_train.shape[0]
+
 	def get_X_batch_var(self, X_trains):
 		return [tensortype_from_shape(X_train.shape)() for X_train in X_trains]
 	def get_y_batch_var(self, y_train):
