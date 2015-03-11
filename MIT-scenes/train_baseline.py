@@ -6,75 +6,75 @@ import numpy as np
 
 '''
 SCORES: FC6 LogisticRegression: 0.56315789473684208
-		FC7 LogisticRegression: 0.55263157894736847
+        FC7 LogisticRegression: 0.55263157894736847
 
-		SIMPLE ENSEMBLE FC6,FC7: 0.58120300751879694
+        SIMPLE ENSEMBLE FC6,FC7: 0.58120300751879694
 
-		SIMPLE AVERAGE FC6, FC7: 0.5759398496240602
+        SIMPLE AVERAGE FC6, FC7: 0.5759398496240602
 
 '''
 class Eye(init.Initializer):
-	def __init__(self, scale=1):
-		self.scale=scale
+    def __init__(self, scale=1):
+        self.scale=scale
 
-	def sample(self, shape):
-		assert shape[0] == shape[1]
-		assert len(shape) == 2
-		return utils.floatX(np.eye(shape[0]) * self.scale)
+    def sample(self, shape):
+        assert shape[0] == shape[1]
+        assert len(shape) == 2
+        return utils.floatX(np.eye(shape[0]) * self.scale)
 
 class GatedMultipleInputsLayer(layers.MultipleInputsLayer):
-	'''
-	A layer that takes in multiple inputs *of the same dimensionality* and computes gates to combine them
-	'''
-	def __init__(self, incomings, Ws=init.Uniform(), bs = init.Constant(0.), nonlinearity=nonlinearities.sigmoid, prob_func=nonlinearities.linear, **kwargs):
-		super(GatedMultipleInputsLayer,self).__init__(incomings,**kwargs)
-		num_out = self.input_shapes[0][1]
-		# make gates
-		self.Ws = [self.create_param(Ws, (num_out,num_out)) for i in range(len(incomings))]
-		self.bs = [self.create_param(bs, (num_out,)) for i in range(len(incomings))]
+    '''
+    A layer that takes in multiple inputs *of the same dimensionality* and computes gates to combine them
+    '''
+    def __init__(self, incomings, Ws=init.Uniform(), bs = init.Constant(0.), nonlinearity=nonlinearities.sigmoid, prob_func=nonlinearities.linear, **kwargs):
+        super(GatedMultipleInputsLayer,self).__init__(incomings,**kwargs)
+        num_out = self.input_shapes[0][1]
+        # make gates
+        self.Ws = [self.create_param(Ws, (num_out,num_out)) for i in range(len(incomings))]
+        self.bs = [self.create_param(bs, (num_out,)) for i in range(len(incomings))]
 
-		self.num_inputs = len(incomings)
-		self.nonlinearity = nonlinearity
+        self.num_inputs = len(incomings)
+        self.nonlinearity = nonlinearity
         self.prob_func = prob_func
 
 
-	def get_output_for(self, inputs, *args, **kwargs):
-		# compute gates
-		gs = [self.nonlinearity(T.dot(inputs[i], self.Ws[i]) + self.bs[i].dimshuffle('x',0)) for i in range(self.num_inputs)]
-	#                gs[0].reshape((1, 1))
-	    # gs is a list of batch_size x num_outputs
-	    # turn gates to probabilities
-	    # stack first, so num_inputs x batch_size x num_outputs
-	    
-	    tens_gates = T.stack(*gs)
-	    # turn into batch_size*num_outputs x num_inputs so that softmax working row wise does what we want
-	    tens_gates = tens_gates.flatten(2).transpose()
-	    tens_gates = self.prob_func(tens_gates).transpose()
-	    # now go back
-	    gs=T.reshape(tens_gates, (self.num_inputs, inputs[0].shape[0], inputs[0].shape[1]))
-	    # now hadamard product
-		# hadamard product
-		new_inps = [gs[i] * inputs[i] for i in range(self.num_inputs)]
-		# stack into one tensor
-		tens = T.stack(*new_inps)
-		# now average
-		return T.mean(tens, axis=0)
+    def get_output_for(self, inputs, *args, **kwargs):
+        # compute gates
+        gs = [self.nonlinearity(T.dot(inputs[i], self.Ws[i]) + self.bs[i].dimshuffle('x',0)) for i in range(self.num_inputs)]
+    #                gs[0].reshape((1, 1))
+        # gs is a list of batch_size x num_outputs
+        # turn gates to probabilities
+        # stack first, so num_inputs x batch_size x num_outputs
+        
+        tens_gates = T.stack(*gs)
+        # turn into batch_size*num_outputs x num_inputs so that softmax working row wise does what we want
+        tens_gates = tens_gates.flatten(2).transpose()
+        tens_gates = self.prob_func(tens_gates).transpose()
+        # now go back
+        gs=T.reshape(tens_gates, (self.num_inputs, inputs[0].shape[0], inputs[0].shape[1]))
+        # now hadamard product
+        # hadamard product
+        new_inps = [gs[i] * inputs[i] for i in range(self.num_inputs)]
+        # stack into one tensor
+        tens = T.stack(*new_inps)
+        # now average
+        return T.mean(tens, axis=0)
 
-	def get_params(self):
-		return self.Ws + self.bs
+    def get_params(self):
+        return self.Ws + self.bs
 
-	def get_output_shape_for(self, input_shapes):
-		# assert that the input shapes are the same
-		assert len(set(input_shapes)) == 1
-		# output is the same as input
-		return input_shapes[0]
+    def get_output_shape_for(self, input_shapes):
+        # assert that the input shapes are the same
+        assert len(set(input_shapes)) == 1
+        # output is the same as input
+        return input_shapes[0]
 
-	def get_output(self, inputs, *args, **kwargs):
-		'''
-		overwrite the get_output function, this probably could be changed in lasagne.
-		'''
-		layer_inputs = [self.input_layers[i].get_output(inputs[i], *args, **kwargs) for i in range(self.num_inputs)]
-		return self.get_output_for(layer_inputs,*args,**kwargs)
+    def get_output(self, inputs, *args, **kwargs):
+        '''
+        overwrite the get_output function, this probably could be changed in lasagne.
+        '''
+        layer_inputs = [self.input_layers[i].get_output(inputs[i], *args, **kwargs) for i in range(self.num_inputs)]
+        return self.get_output_for(layer_inputs,*args,**kwargs)
 
 
 batch_size = 50
@@ -116,18 +116,18 @@ pred = T.argmax(
 accuracy = T.mean(T.eq(pred, y_batch), dtype=theano.config.floatX)
 
 print "begin compiling"
-givens = 	{X_batch_one: X_train_fc6[batch_index*batch_size:(batch_index+1)*batch_size],
-			X_batch_two: X_train_fc7[batch_index*batch_size:(batch_index+1)*batch_size],
-			y_batch: y_train[batch_index*batch_size:(batch_index+1)*batch_size]}
+givens =    {X_batch_one: X_train_fc6[batch_index*batch_size:(batch_index+1)*batch_size],
+            X_batch_two: X_train_fc7[batch_index*batch_size:(batch_index+1)*batch_size],
+            y_batch: y_train[batch_index*batch_size:(batch_index+1)*batch_size]}
 train = theano.function([batch_index], loss_train, updates=upds, givens=givens)
 test = theano.function([], accuracy, givens={X_batch_one:X_test_fc6, X_batch_two:X_test_fc7, y_batch:y_test})
 num_epochs = 1000
 for epoch in range(num_epochs):
         print "epoch %s" % epoch
-	for batch in range(total/batch_size):
-		loss = train(batch)
-	if epoch % 25 == 0:
-		print test()
+    for batch in range(total/batch_size):
+        loss = train(batch)
+    if epoch % 25 == 0:
+        print test()
 
 
 print test()
@@ -159,8 +159,8 @@ print test()
 # num_epochs = 100
 # for epoch in range(num_epochs):
 #         print "epoch %s" % epoch
-# 	for batch in range(total/batch_size):
-# 		loss = train(batch)
+#   for batch in range(total/batch_size):
+#       loss = train(batch)
 
 # test = theano.function([], accuracy, givens={X_batch:X_test_fc6, y_batch:y_test})
 # print test()
@@ -199,8 +199,8 @@ print test()
 # num_epochs = 100
 # for epoch in range(num_epochs):
 #         print "epoch %s" % epoch
-# 	for batch in range(total/batch_size):
-# 		loss = train(batch)
+#   for batch in range(total/batch_size):
+#       loss = train(batch)
 
 # test = theano.function([], accuracy, givens={X_batch:X_test_fc7, y_batch:y_test})
 # print test()
