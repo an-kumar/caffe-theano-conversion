@@ -194,7 +194,7 @@ class SGDMomentumSolver(BaseSolver):
 		batches_per_epoch = (dataset.train_size / batch_size) + 1
 		loss_history = []
 		for epoch in range(num_epochs):
-			for batch in batches_per_epoch:
+			for batch in range(batches_per_epoch):
 				loss_history.append(func(batch))
 			if epoch % 25 == 0:
 				print "curr loss: %s" % (loss_history[-1])
