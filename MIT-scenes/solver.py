@@ -175,6 +175,11 @@ class SGDMomentumSolver(BaseSolver):
 
 		# compile function
 		# todo: obj loss?
+		for upd1,upd2 in updates:
+			print upd1
+			print upd2
+			print upd1.type
+			print upd2.type
 		func = theano.function([batch_index], obj_loss, updates=updates, givens=solver_givens)
 		if model.pred_func is not None:
 			test_func = theano.function([], pred_func, givens=dataset.test_givens())
