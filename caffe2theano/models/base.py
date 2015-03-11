@@ -31,8 +31,8 @@ class BaseModel(object):
 		# currently assumed that all_layers[-1] will be input (this is how it should be, i think, but edge cases might exist)
 		self.last_layer = last_layer
 		self.input_layer = self.all_layers[-1]
-		self.compile_kwargs = compile_kwargs
-		self.compile(**compile_kwargs)
+		# self.compile_kwargs = compile_kwargs
+		# self.compile(**compile_kwargs)
 		self.layers_by_name = {layer.name:layer for layer in self.all_layers}
 		self.layer_names = [layer.name for layer in self.all_layers]
 
