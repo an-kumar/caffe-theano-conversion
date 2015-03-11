@@ -104,6 +104,7 @@ givens = 	{X_batch_one: X_train_fc6[batch_index*batch_size:(batch_index+1)*batch
 			X_batch_two: X_train_fc7[batch_index*batch_size:(batch_index+1)*batch_size],
 			y_batch: y_train[batch_index*batch_size:(batch_index+1)*batch_size]}
 train = theano.function([batch_index], loss_train, updates=upds, givens=givens)
+test = theano.function([], accuracy, givens={X_batch_one:X_test_fc6, X_batch_two:X_test_fc7, y_batch:y_test})
 num_epochs = 500
 for epoch in range(num_epochs):
         print "epoch %s" % epoch
@@ -112,7 +113,7 @@ for epoch in range(num_epochs):
 	if epoch % 25 == 0:
 		print test()
 
-test = theano.function([], accuracy, givens={X_batch_one:X_test_fc6, X_batch_two:X_test_fc7, y_batch:y_test})
+
 print test()
 
 
