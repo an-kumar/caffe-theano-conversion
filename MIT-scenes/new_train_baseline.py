@@ -96,13 +96,13 @@ lmodel = models.BaseModel(output)
 print "load datasets.."
 
 # load datasets
-X_train_fc6 = np.load('/root/proj/MIT_dumped/X_train_fc6.npy')
-X_test_fc6 = np.load('/root/proj/MIT_dumped/X_test_fc6.npy')
-y_train = np.load('/root/proj/MIT_dumped/y_train.npy')
-y_test = np.load('/root/proj/MIT_dumped/y_test.npy')
+X_train_fc6 = np.load('/root/proj/MIT_dumped/X_train_fc6.npy').astype(np.float32)
+X_test_fc6 = np.load('/root/proj/MIT_dumped/X_test_fc6.npy').astype(np.float32)
+y_train = np.load('/root/proj/MIT_dumped/y_train.npy').astype(np.float32)
+y_test = np.load('/root/proj/MIT_dumped/y_test.npy').astype(np.float32)
 # load datasets
-X_train_fc7 = np.load('/root/proj/MIT_dumped/X_train_fc7.npy')
-X_test_fc7 = np.load('/root/proj/MIT_dumped/X_test_fc7.npy')
+X_train_fc7 = np.load('/root/proj/MIT_dumped/X_train_fc7.npy').astype(np.float32)
+X_test_fc7 = np.load('/root/proj/MIT_dumped/X_test_fc7.npy').astype(np.float32)
 ds = MultipleInputDataset([X_train_fc6,X_train_fc7], y_train, [X_test_fc6, X_test_fc7], y_test)
 # make pred func (todo: put in model)
 pred = T.argmax(
