@@ -86,7 +86,7 @@ batch_index = T.iscalar()
 
 input_one = layers.InputLayer((50, 4096))
 input_two = layers.InputLayer((50,4096))
-gated_avg = GatedMultipleInputsLayer([input_one,input_two], nonlinearity=nonlinearities.tanh, prob_func=nonlinearities.softmax)
+gated_avg = GatedMultipleInputsLayer([input_one,input_two], nonlinearity=nonlinearities.relu, prob_func=nonlinearities.softmax)
 output = layers.DenseLayer(gated_avg, num_units=67, nonlinearity=nonlinearities.softmax)
 
 
@@ -105,7 +105,7 @@ objective = objectives.Objective(output,loss_function=objectives.multinomial_nll
 loss_train = objective.get_loss([X_batch_one, X_batch_two], target=y_batch)
 
 
-LEARNING_RATE =0.122
+LEARNING_RATE =0.0122
 MOMENTUM=0.9
 REG = .0009
 reg_loss = regularization.l2(output) * REG

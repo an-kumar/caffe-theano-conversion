@@ -180,6 +180,9 @@ class SGDMomentumSolver(BaseSolver):
 			print upd2
 			print upd1.type
 			print upd2.type
+                for key in solver_givens:
+                    print key.type
+                    print solver_givens[key]
 		func = theano.function([batch_index], obj_loss, updates=updates, givens=solver_givens)
 		if model.pred_func is not None:
 			test_func = theano.function([], pred_func, givens=dataset.test_givens())
@@ -199,15 +202,16 @@ class SGDMomentumSolver(BaseSolver):
 
 
 	def get_updates(self, loss, all_params):
+                return lasagne.updates.momentum(loss,all_params, self.global_lr), {}
 		all_grads = theano.grad(loss, all_params)
 		# all_lrs maps param -> learning rate
 		all_lrs = {param:T.scalar('param_%s' % str(param)) for param in all_params}
 
 		updates = []
 		for param_i, grad_i in zip(all_params, all_grads):
-			mparam_i = theano.shared(np.zeros(param_i.get_value().shape, dtype=theano.config.floatX),broadcastable=param_i.broadcastable)
+			mparam_i = theano.shared(np.zeros(param_i.get_value().shape).astype(theano.config.floatX),broadcastable=param_i.broadcastable)
 			print mparam_i.type
-			print self.momentum.type
+			print self.momentum
 			print all_lrs[param_i].type
 			print grad_i.type
 			v = self.momentum * mparam_i - all_lrs[param_i] * grad_i
