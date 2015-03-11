@@ -33,6 +33,8 @@ class BaseModel(object):
 		self.input_layer = self.all_layers[-1]
 		self.compile_kwargs = compile_kwargs
 		self.compile(**compile_kwargs)
+		self.layers_by_name = {layer.name:layer for layer in self.all_layers}
+		self.layer_names = [layer.name for layer in self.all_layers]
 
 
 	def compile(self, *args, **kwargs):
@@ -50,6 +52,23 @@ class BaseModel(object):
 		# store function in self.forward
 		self.forward = theano.function([symbolic_input], outputs)
 
+
+	def get_W_params_by_name(self,name):
+		layer = self.layers_by_name[name]
+		if type(layer.W) == list:
+			return layer.W
+		else:
+			return [layer.W]
+	def get_b_params_by_name(self, name):
+		layer = self.layers_by_name[name]
+		if type(layer.b) == list:
+			return layer.b
+		else:
+			return [layer.b]
+
+
+	def get_output(self,*args,**kwargs):
+		return self.last_layer.get_output(*args,**kwargs)
 
 
 
