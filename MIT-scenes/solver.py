@@ -185,7 +185,7 @@ class SGDMomentumSolver(BaseSolver):
                     print solver_givens[key]
 		func = theano.function([batch_index], obj_loss, updates=updates, givens=solver_givens)
 		if model.pred_func is not None:
-			test_func = theano.function([], pred_func, givens=dataset.test_givens())
+			test_func = theano.function([], model.pred_func, givens=dataset.test_givens())
 		else:
 			test_func = None
 		# train
