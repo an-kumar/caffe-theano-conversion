@@ -169,7 +169,7 @@ class SGDMomentumSolver(BaseSolver):
 
 		# add dataset givens
 		# todo: is "batch_index" not general enough?
-		batch_index = T.iscalar()
+		batch_index = T.iscalar('batch')
 		solver_givens.update(dataset.train_givens(batch_index, batch_size))
 
 		# compile function
