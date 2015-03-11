@@ -173,6 +173,10 @@ class SGDMomentumSolver(BaseSolver):
 		# add dataset givens
 		# todo: is "batch_index" not general enough?
 		batch_index = T.iscalar('batch')
+		dsgivens = dataset.train_givens()
+		for ds in dsgivens:
+			print dsgivens[ds]
+			print ds.type
 		solver_givens.update(dataset.train_givens(batch_index, batch_size))
 
 		# compile function
@@ -191,7 +195,7 @@ class SGDMomentumSolver(BaseSolver):
 		else:
 			test_func = None
 		# train
-		batches_per_epoch = (dataset.train_size / batch_size) + 1
+		batches_per_epoch = int(np.ceil(float(dataset.train_size )/ batch_size))
 		loss_history = []
 		for epoch in range(num_epochs):
 			for batch in range(batches_per_epoch):
@@ -212,10 +216,6 @@ class SGDMomentumSolver(BaseSolver):
 		updates = []
 		for param_i, grad_i in zip(all_params, all_grads):
 			mparam_i = theano.shared(np.zeros(param_i.get_value().shape).astype(theano.config.floatX),broadcastable=param_i.broadcastable)
-			print mparam_i.type
-			print self.momentum
-			print all_lrs[param_i].type
-			print grad_i.type
 			v = self.momentum * mparam_i - all_lrs[param_i] * grad_i
 			updates.append((mparam_i, v))
 			updates.append((param_i, param_i + v))
