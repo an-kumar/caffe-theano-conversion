@@ -123,7 +123,7 @@ train = theano.function([batch_index], loss_train, updates=upds, givens=givens)
 test = theano.function([], accuracy, givens={X_batch_one:X_test_fc6, X_batch_two:X_test_fc7, y_batch:y_test})
 num_epochs = 1000
 for epoch in range(num_epochs):
-        print "epoch %s" % epoch
+    print "epoch %s" % epoch
     for batch in range(total/batch_size):
         loss = train(batch)
     if epoch % 25 == 0:
