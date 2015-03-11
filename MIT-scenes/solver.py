@@ -29,7 +29,7 @@ def tensortype_from_shape(shape, intg=False):
 class BaseSolver(object):
 	def __init__(self, reg='l2', reg_scale=0.01):
 		self.reg = reg
-		self.reg_scale = 0.01
+		self.reg_scale = np.cast[theano.config.floatX](0.01)
 		self.lasagne_reg = self.find_lasagne_reg()
 
 	def get_reg_loss(self, model, include_bias=False):
@@ -110,7 +110,7 @@ class SGDMomentumSolver(BaseSolver):
 		gamma : after lr_drop_epochs, the lrs become gamma*lr
 		'''
 		super(SGDMomentumSolver,self).__init__(**kwargs)
-		self.global_lr = global_lr
+		self.global_lr = np.cast[theano.config.floatX](global_lr)
 		self.momentum = momentum
 		self.specific_W_lrs = {}
 		self.specific_b_lrs = {}
@@ -202,7 +202,7 @@ class SGDMomentumSolver(BaseSolver):
 
 
 	def get_updates(self, loss, all_params):
-                return lasagne.updates.momentum(loss,all_params, self.global_lr), {}
+                # return lasagne.updates.momentum(loss,all_params, self.global_lr), {}
 		all_grads = theano.grad(loss, all_params)
 		# all_lrs maps param -> learning rate
 		all_lrs = {param:T.scalar('param_%s' % str(param)) for param in all_params}
