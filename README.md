@@ -59,7 +59,7 @@ self.dense_connectivity = True
 ```
 to:
 ```
-if group == 1:
+if numGroups == 1:
 	self.dense_connectivity = True
 else:
 	self.dense_connectivity = False
