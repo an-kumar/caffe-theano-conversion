@@ -109,7 +109,7 @@ class SGDMomentumSolver(BaseSolver):
 		gamma : after lr_drop_epochs, the lrs become gamma*lr
 		'''
 		super(SGDMomentumSolver,self).__init__(**kwargs)
-		self.global_lr = global_lr.astype(theano.config.floatX)
+		self.global_lr = global_lr
 		self.momentum = momentum
 		self.specific_W_lrs = {}
 		self.specific_b_lrs = {}
@@ -195,7 +195,7 @@ class SGDMomentumSolver(BaseSolver):
 	def get_updates(self, loss, all_params):
 		all_grads = theano.grad(loss, all_params)
 		# all_lrs maps param -> learning rate
-		all_lrs = {param:T.scalar() for param in all_params}
+		all_lrs = {param:T.scalar('param_%s' % str(param)) for param in all_params}
 
 		updates = []
 		for param_i, grad_i in zip(all_params, all_grads):
