@@ -49,7 +49,7 @@ class BaseActs(GpuOp):
     """
     Shared code for wrapping various convnet operations.
     """
-    def __init__(self, pad=0, partial_sum=None, stride=1, group=1):
+    def __init__(self, pad=0, partial_sum=None, stride=1, numGroups=1):
 ```
 
 Then, in that init function, change:
@@ -67,7 +67,7 @@ else:
 
 and add a line:
 ```
-self.group = group
+self.numGroups = numGroups
 ```
 
 then, in this file: https://github.com/lisa-lab/pylearn2/blob/master/pylearn2/sandbox/cuda_convnet/filter_acts.py, change FilterActs c_code function from:
@@ -88,7 +88,7 @@ if self.dense_connectivity:
 else:
 	basic_setup += """
 	#define numGroups %s
-	""" % self.group
+	""" % self.numGroups
 ```
 
 You should be able to not have that if statement at all, but I kept it in.
