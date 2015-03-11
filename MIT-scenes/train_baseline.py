@@ -26,7 +26,7 @@ class GatedMultipleInputsLayer(layers.MultipleInputsLayer):
 	'''
 	A layer that takes in multiple inputs *of the same dimensionality* and computes gates to combine them
 	'''
-	def __init__(self, incomings, Ws=init.Uniform(), bs = init.Constant(0.), nonlinearity=nonlinearities.sigmoid, **kwargs):
+	def __init__(self, incomings, Ws=init.Uniform(), bs = init.Constant(0.), nonlinearity=nonlinearities.sigmoid, prob_func=nonlinearities.linear, **kwargs):
 		super(GatedMultipleInputsLayer,self).__init__(incomings,**kwargs)
 		num_out = self.input_shapes[0][1]
 		# make gates
@@ -35,11 +35,24 @@ class GatedMultipleInputsLayer(layers.MultipleInputsLayer):
 
 		self.num_inputs = len(incomings)
 		self.nonlinearity = nonlinearity
+                self.prob_func = prob_func
 
 
 	def get_output_for(self, inputs, *args, **kwargs):
 		# compute gates
 		gs = [self.nonlinearity(T.dot(inputs[i], self.Ws[i]) + self.bs[i].dimshuffle('x',0)) for i in range(self.num_inputs)]
+#                gs[0].reshape((1, 1))
+                # gs is a list of batch_size x num_outputs
+                # turn gates to probabilities
+                # stack first, so num_inputs x batch_size x num_outputs
+                
+                tens_gates = T.stack(*gs)
+                # turn into batch_size*num_outputs x num_inputs so that softmax working row wise does what we want
+                tens_gates = tens_gates.flatten(2).transpose()
+                tens_gates = self.prob_func(tens_gates).transpose()
+                # now go back
+                gs=T.reshape(tens_gates, (self.num_inputs, inputs[0].shape[0], inputs[0].shape[1]))
+                # now hadamard product
 		# hadamard product
 		new_inps = [gs[i] * inputs[i] for i in range(self.num_inputs)]
 		# stack into one tensor
@@ -71,9 +84,9 @@ X_batch_two = T.matrix()
 y_batch = T.ivector()
 batch_index = T.iscalar()
 
-input_one = layers.InputLayer((100, 4096))
-input_two = layers.InputLayer((100,4096))
-gated_avg = GatedMultipleInputsLayer([input_one,input_two])
+input_one = layers.InputLayer((50, 4096))
+input_two = layers.InputLayer((50,4096))
+gated_avg = GatedMultipleInputsLayer([input_one,input_two], nonlinearity=nonlinearities.identity, prob_func=nonlinearities.softmax)
 output = layers.DenseLayer(gated_avg, num_units=67, nonlinearity=nonlinearities.softmax)
 
 
@@ -92,10 +105,10 @@ objective = objectives.Objective(output,loss_function=objectives.multinomial_nll
 loss_train = objective.get_loss([X_batch_one, X_batch_two], target=y_batch)
 
 
-LEARNING_RATE =0.008
+LEARNING_RATE =0.122
 MOMENTUM=0.9
-REG = .01
-reg_loss = regularization.l2(output)
+REG = .0003
+reg_loss = regularization.l2(output) * REG
 total_loss = loss_train + reg_loss
 upds = updates.nesterov_momentum(total_loss, all_params, LEARNING_RATE, MOMENTUM)
 pred = T.argmax(
@@ -108,7 +121,7 @@ givens = 	{X_batch_one: X_train_fc6[batch_index*batch_size:(batch_index+1)*batch
 			y_batch: y_train[batch_index*batch_size:(batch_index+1)*batch_size]}
 train = theano.function([batch_index], loss_train, updates=upds, givens=givens)
 test = theano.function([], accuracy, givens={X_batch_one:X_test_fc6, X_batch_two:X_test_fc7, y_batch:y_test})
-num_epochs = 500
+num_epochs = 1000
 for epoch in range(num_epochs):
         print "epoch %s" % epoch
 	for batch in range(total/batch_size):
