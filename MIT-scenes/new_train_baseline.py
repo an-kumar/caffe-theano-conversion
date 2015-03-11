@@ -97,4 +97,4 @@ pred = T.argmax(
 lmodel.pred_func = T.mean(T.eq(pred, ds.y_batch_var), dtype=theano.config.floatX)
 
 num_epochs= 1000
-solver.solve(lmodel, ds, batch_size, num_epochs)
+solv.solve(lmodel, ds, batch_size, num_epochs)
