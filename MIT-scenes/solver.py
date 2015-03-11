@@ -200,10 +200,10 @@ class SGDMomentumSolver(BaseSolver):
 		updates = []
 		for param_i, grad_i in zip(all_params, all_grads):
 			mparam_i = theano.shared(np.zeros(param_i.get_value().shape, dtype=theano.config.floatX),broadcastable=param_i.broadcastable)
-			print mparam_i
-			print self.momentum
-			print all_lrs[param_i]
-			print grad_i
+			print mparam_i.type
+			print self.momentum.type
+			print all_lrs[param_i].type
+			print grad_i.type
 			v = self.momentum * mparam_i - all_lrs[param_i] * grad_i
 			updates.append((mparam_i, v))
 			updates.append((param_i, param_i + v))
