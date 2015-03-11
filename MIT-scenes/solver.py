@@ -109,7 +109,7 @@ class SGDMomentumSolver(BaseSolver):
 		gamma : after lr_drop_epochs, the lrs become gamma*lr
 		'''
 		super(SGDMomentumSolver,self).__init__(**kwargs)
-		self.global_lr = global_lr
+		self.global_lr = global_lr.astype(theano.config.floatX)
 		self.momentum = momentum
 		self.specific_W_lrs = {}
 		self.specific_b_lrs = {}
