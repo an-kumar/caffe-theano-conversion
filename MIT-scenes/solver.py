@@ -22,6 +22,43 @@ def tensortype_from_shape(shape, intg=False):
 	elif len(shape) == 4:
 		return T.tensor4
 
+
+
+
+class BaseSolver(object):
+	def __init__(self, reg='l2', reg_scale=0.01):
+		self.reg = reg
+		self.reg_scale = 0.01
+		self.lasagne_reg = self.find_lasagne_reg()
+
+	def get_reg_loss(self, model, include_bias=False):
+		all_params = self.get_all_params(model, include_bias=include_bias)
+		loss = self.lasagne_reg(all_params)
+		return loss * reg_scale
+
+
+	def find_objective(self, model, objective):
+		if objective == 'multinomial_nll':
+			return lasagne.objectives.Objective(model.last_layer, lasagne.objectives.multinomial_nll)
+
+
+	def find_lasagne_reg(self):
+		if self.reg == 'l2':
+			return lasagne.regularization.l2
+
+	def get_all_params(self, model, include_bias=True):
+		'''
+		finds all the parameters of a lasagne model
+		'''
+		if include_bias:
+			return lasagne.layers.get_all_params(model.last_layer)
+		else:
+			return lasagne.layers.get_all_non_bias_params(model.last_layer)
+
+	def get_updates(self):
+		raise NotImplementedError
+
+
 class MultipleInputDataset(object):
 	'''
 	for now, extremely simple. todo: decompose to BaseDataset
@@ -171,37 +208,3 @@ class SGDMomentumSolver(BaseSolver):
 
 
 
-
-
-class BaseSolver(object):
-	def __init__(self, reg='l2', reg_scale=0.01):
-		self.reg = reg
-		self.reg_scale = 0.01
-		self.lasagne_reg = self.find_lasagne_reg()
-
-	def get_reg_loss(self, model, include_bias=False):
-		all_params = self.get_all_params(model, include_bias=include_bias)
-		loss = self.lasagne_reg(all_params)
-		return loss * reg_scale
-
-
-	def find_objective(self, model, objective):
-		if objective == 'multinomial_nll':
-			return lasagne.objectives.Objective(model.last_layer, lasagne.objectives.multinomial_nll)
-
-
-	def find_lasagne_reg(self):
-		if self.reg == 'l2':
-			return lasagne.regularization.l2
-
-	def get_all_params(self, model, include_bias=True):
-		'''
-		finds all the parameters of a lasagne model
-		'''
-		if include_bias:
-			return lasagne.layers.get_all_params(model.last_layer)
-		else:
-			return lasagne.layers.get_all_non_bias_params(model.last_layer)
-
-	def get_updates(self):
-		raise NotImplementedError
