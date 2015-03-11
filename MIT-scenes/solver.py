@@ -69,7 +69,7 @@ class MultipleInputDataset(object):
 		'''
 		self.X_trains = [theano.shared(X_train.astype(theano.config.floatX)) for X_train in X_trains]
 		self.y_train = T.cast(theano.shared(y_train.astype(theano.config.floatX)),y_cast)
-		self.X_tests = [theano.shared(X_test.astype(theano.config.floatX)) for X_test in X_test]
+		self.X_tests = [theano.shared(X_test.astype(theano.config.floatX)) for X_test in X_tests]
 		self.y_test = T.cast(theano.shared(y_test.astype(theano.config.floatX)),y_cast)
 
 		self.X_batch_var = self.get_X_batch_var()
