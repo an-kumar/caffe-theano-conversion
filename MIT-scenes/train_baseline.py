@@ -56,6 +56,13 @@ class GatedMultipleInputsLayer(layers.MultipleInputsLayer):
 		# output is the same as input
 		return input_shapes[0]
 
+	def get_output(self, inputs, *args, **kwargs):
+		'''
+		overwrite the get_output function, this probably could be changed in lasagne.
+		'''
+		layer_inputs = [self.input_layers[i].get_output(inputs[i], *args, **kwargs) for i in range(self.num_inputs)]
+		return self.get_output_for(layer_inputs,*args,**kwargs)
+
 
 batch_size = 50
 total = 5350
