@@ -32,8 +32,8 @@ class BaseSolver(object):
 		self.lasagne_reg = self.find_lasagne_reg()
 
 	def get_reg_loss(self, model, include_bias=False):
-		all_params = self.get_all_params(model, include_bias=include_bias)
-		loss = self.lasagne_reg(all_params)
+		# all_params = self.get_all_params(model, include_bias=include_bias)
+		loss = self.lasagne_reg(model.last_layer)
 		return loss * reg_scale
 
 
@@ -206,10 +206,6 @@ class SGDMomentumSolver(BaseSolver):
 		return updates, all_lrs
 
 
-
-
-	def step(self, model, include_bias=True):
-		all_param
 
 
 
