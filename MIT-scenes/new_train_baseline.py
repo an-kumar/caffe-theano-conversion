@@ -74,12 +74,13 @@ REG = .01
 solv = SGDMomentumSolver(LEARNING_RATE)
 batch_size = 50
 # == defining model == # 
+print "build model.."
 input_one = layers.InputLayer((50, 4096))
 input_two = layers.InputLayer((50,4096))
 gated_avg = GatedMultipleInputsLayer([input_one,input_two])
 output = layers.DenseLayer(gated_avg, num_units=67, nonlinearity=nonlinearities.softmax)
 lmodel = models.BaseModel(output)
-
+print "load datasets.."
 
 # load datasets
 X_train_fc6 = np.load('/root/proj/MIT_dumped/X_train_fc6.npy')
