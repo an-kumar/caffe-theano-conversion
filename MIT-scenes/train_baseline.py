@@ -1,4 +1,4 @@
-from lasagne import layers, nonlinearities,objectives, updates, init, utils
+from lasagne import layers, nonlinearities,objectives, updates, init, utils, regularization
 import theano
 import theano.tensor as T
 import sys
@@ -94,7 +94,10 @@ loss_train = objective.get_loss([X_batch_one, X_batch_two], target=y_batch)
 
 LEARNING_RATE =0.008
 MOMENTUM=0.9
-upds = updates.nesterov_momentum(loss_train, all_params, LEARNING_RATE, MOMENTUM)
+REG = .01
+reg_loss = regularization.l2(output)
+total_loss = loss_train + reg_loss
+upds = updates.nesterov_momentum(total_loss, all_params, LEARNING_RATE, MOMENTUM)
 pred = T.argmax(
     output.get_output([X_batch_one, X_batch_two], deterministic=True), axis=1)
 accuracy = T.mean(T.eq(pred, y_batch), dtype=theano.config.floatX)
