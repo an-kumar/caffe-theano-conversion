@@ -20,7 +20,7 @@ class Eye(init.Initializer):
 	def sample(self, shape):
 		assert shape[0] == shape[1]
 		assert len(shape) == 2
-		return utils.floatX(np.eye(shape) * self.scale)
+		return utils.floatX(np.eye(shape[0]) * self.scale)
 
 class GatedMultipleInputsLayer(layers.MultipleInputsLayer):
 	'''
