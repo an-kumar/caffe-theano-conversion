@@ -35,24 +35,24 @@ class GatedMultipleInputsLayer(layers.MultipleInputsLayer):
 
 		self.num_inputs = len(incomings)
 		self.nonlinearity = nonlinearity
-                self.prob_func = prob_func
+        self.prob_func = prob_func
 
 
 	def get_output_for(self, inputs, *args, **kwargs):
 		# compute gates
 		gs = [self.nonlinearity(T.dot(inputs[i], self.Ws[i]) + self.bs[i].dimshuffle('x',0)) for i in range(self.num_inputs)]
-#                gs[0].reshape((1, 1))
-                # gs is a list of batch_size x num_outputs
-                # turn gates to probabilities
-                # stack first, so num_inputs x batch_size x num_outputs
-                
-                tens_gates = T.stack(*gs)
-                # turn into batch_size*num_outputs x num_inputs so that softmax working row wise does what we want
-                tens_gates = tens_gates.flatten(2).transpose()
-                tens_gates = self.prob_func(tens_gates).transpose()
-                # now go back
-                gs=T.reshape(tens_gates, (self.num_inputs, inputs[0].shape[0], inputs[0].shape[1]))
-                # now hadamard product
+	#                gs[0].reshape((1, 1))
+	    # gs is a list of batch_size x num_outputs
+	    # turn gates to probabilities
+	    # stack first, so num_inputs x batch_size x num_outputs
+	    
+	    tens_gates = T.stack(*gs)
+	    # turn into batch_size*num_outputs x num_inputs so that softmax working row wise does what we want
+	    tens_gates = tens_gates.flatten(2).transpose()
+	    tens_gates = self.prob_func(tens_gates).transpose()
+	    # now go back
+	    gs=T.reshape(tens_gates, (self.num_inputs, inputs[0].shape[0], inputs[0].shape[1]))
+	    # now hadamard product
 		# hadamard product
 		new_inps = [gs[i] * inputs[i] for i in range(self.num_inputs)]
 		# stack into one tensor
@@ -86,7 +86,7 @@ batch_index = T.iscalar()
 
 input_one = layers.InputLayer((50, 4096))
 input_two = layers.InputLayer((50,4096))
-gated_avg = GatedMultipleInputsLayer([input_one,input_two], nonlinearity=nonlinearities.identity, prob_func=nonlinearities.softmax)
+gated_avg = GatedMultipleInputsLayer([input_one,input_two], nonlinearity=nonlinearities.tanh, prob_func=nonlinearities.softmax)
 output = layers.DenseLayer(gated_avg, num_units=67, nonlinearity=nonlinearities.softmax)
 
 
@@ -107,7 +107,7 @@ loss_train = objective.get_loss([X_batch_one, X_batch_two], target=y_batch)
 
 LEARNING_RATE =0.122
 MOMENTUM=0.9
-REG = .0003
+REG = .0009
 reg_loss = regularization.l2(output) * REG
 total_loss = loss_train + reg_loss
 upds = updates.nesterov_momentum(total_loss, all_params, LEARNING_RATE, MOMENTUM)
