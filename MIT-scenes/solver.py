@@ -34,7 +34,7 @@ class BaseSolver(object):
 	def get_reg_loss(self, model, include_bias=False):
 		# all_params = self.get_all_params(model, include_bias=include_bias)
 		loss = self.lasagne_reg(model.last_layer)
-		return loss * reg_scale
+		return loss * self.reg_scale
 
 
 	def find_objective(self, model, objective):
