@@ -88,6 +88,11 @@ class MultipleInputDataset(object):
 		givens[self.y_batch_var] = self.y_train[batch_index*batch_size:(batch_index+1)*batch_size]
 		return givens
 
+	def test_givens(self):
+		givens = {self.X_batch_var[i]:self.X_tests[i] for i in range(len(self.X_tests))}
+		givens[self.y_batch_var] = self.y_test
+		return givens		
+
 
 
 

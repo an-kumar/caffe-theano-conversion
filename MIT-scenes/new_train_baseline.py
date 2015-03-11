@@ -90,11 +90,11 @@ y_test = np.load('/root/proj/MIT_dumped/y_test.npy')
 # load datasets
 X_train_fc7 = np.load('/root/proj/MIT_dumped/X_train_fc7.npy')
 X_test_fc7 = np.load('/root/proj/MIT_dumped/X_test_fc7.npy')
+ds = MultipleInputDataset([X_train_fc6,X_train_fc7], y_train, [X_test_fc6, X_test_fc7], y_test)
 # make pred func (todo: put in model)
 pred = T.argmax(
-    lmodel.get_output([X_batch_one, X_batch_two], deterministic=True), axis=1)
-lmodel.pred_func = T.mean(T.eq(pred, y_batch), dtype=theano.config.floatX)
-# make ds class
-ds = MultipleInputDataset([X_train_fc6,X_train_fc7], y_train, [X_test_fc6, X_test_fc7], y_test)
+    lmodel.get_output(ds.X_batch_var, deterministic=True), axis=1)
+lmodel.pred_func = T.mean(T.eq(pred, ds.y_batch_var), dtype=theano.config.floatX)
+
 num_epochs= 1000
 solver.solve(lmodel, ds, batch_size, num_epochs)
