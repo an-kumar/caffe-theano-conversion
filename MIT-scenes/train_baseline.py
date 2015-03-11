@@ -34,7 +34,7 @@ pred = T.argmax(
 accuracy = T.mean(T.eq(pred, y_batch), dtype=theano.config.floatX)
 
 print "begin compiling fc6..."
-train = theano.function([batch_index], loss_train, updates=updates, givens={X_batch:X_train_fc6[batch_index*batch_size:(batch_index+1)*batch_size)], y_batch:y_train[batch_index*batch_size:(batch_index+1)*batch_size)]})
+train = theano.function([batch_index], loss_train, updates=updates, givens={X_batch:X_train_fc6[batch_index*batch_size:(batch_index+1)*batch_size], y_batch:y_train[batch_index*batch_size:(batch_index+1)*batch_size]})
 nepochs = 100
 for epoch in range(num_epochs):
 	for batch in range(total/batch_size):
