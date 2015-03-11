@@ -72,8 +72,8 @@ class MultipleInputDataset(object):
 		self.X_tests = [theano.shared(X_test.astype(theano.config.floatX)) for X_test in X_tests]
 		self.y_test = T.cast(theano.shared(y_test.astype(theano.config.floatX)),y_cast)
 
-		self.X_batch_var = self.get_X_batch_var()
-		self.y_batch_var = self.get_y_batch_var()
+		self.X_batch_var = self.get_X_batch_var(X_trains)
+		self.y_batch_var = self.get_y_batch_var(y_train)
 
 	def get_X_batch_var(self, X_trains):
 		return [tensortype_from_shape(X_train.shape)() for X_train in self.X_trains]
