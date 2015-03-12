@@ -9,8 +9,9 @@ import numpy as np
 import caffe2theano
 import dataset
 
-lmodel = caffe2theano.convert('/root/caffe/models/bvlc_reference_caffenet/deploy.prototxt','/root/caffe/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel')
+lmodel = caffe2theano.conversion.convert('/root/caffe/models/bvlc_reference_caffenet/deploy.prototxt','/root/caffe/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel')
 ds = dataset.ImageDirectoryDataset('../../proj/Images', 1000, 250)
+
 
 inp = lasagne.layers.InputLayer(ds.X_batch_shape)
 reshape_layer = lasagne.layers.ReshapeLayer(lmodel.input_layer, ([0]*[1], [2], [3], [4]))

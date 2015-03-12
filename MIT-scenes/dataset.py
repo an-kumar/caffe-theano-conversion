@@ -76,12 +76,21 @@ class ImageDirectoryDataset(object):
         self.num_CPU_store = num_CPU_store
         self.num_GPU_store = num_GPU_store
         self.l2i, self.i2l, self.all_train_files, self.all_test_files = self.init_dir(maindir_path)
+        self.train_size = len(self.all_train_files)
+        self.test_size = len(self.all_test_files)
 
         self.gpu_batches_per_cpu_batch = int(np.ceil(num_CPU_store/float(num_GPU_store)))
+
+        
+        mean_image = caffe2theano.conversion.convert_mean_image('/root/caffe/data/ilsvrc12/imagenet_mean.binaryproto')
+        self.mean_image = transform.resize(mean_image, (3,227,227))
+
 
         self.window_shape= window_shape
         self.window_step = window_step
         self.init_train()
+
+
 
         self.X_batch_shape = self.CPU_X_train.shape
         self.X_batch_var = self.get_X_batch_var()
@@ -90,8 +99,6 @@ class ImageDirectoryDataset(object):
         self.curr_gpu_batch = 0
         self.curr_cpu_batch = 0
 
-        mean_image = caffe2theano.conversion.convert_mean_image('/root/caffe/data/ilsvrc12/imagenet_mean.binaryproto')
-        self.mean_image = skimage.transform.resize(mean_image, (3,227,227))
 
 
     def get_X_batch_var(self):
@@ -101,8 +108,23 @@ class ImageDirectoryDataset(object):
 
 
     def init_train(self):
-        self.CPU_X_train, self.CPU_y_train = self.load_cpu(0,self.num_CPU_store)
+        self.load_cpu(0,self.num_CPU_store)
         self.GPU_X_train, self.GPU_y_train = self.load_gpu(0, self.num_GPU_store)
+
+    def dump_to_pickles(self,mode='train'):
+        if mode == 'train':
+            size = self.train_size
+        elif mode == 'test':
+            size = self.test_size
+            
+        num_batches = int(np.ceil(self.train_size / float(self.num_CPU_store)))
+        for i in range(num_batches):
+            self.load_cpu(i, self.num_CPU_store, mode)
+            np.save('train_batch_%s' % str(i), self.CPU_X_train)
+
+            
+
+
 
     def load_cpu(self, batch_index, batch_size, mode='train'):
         '''
@@ -110,7 +132,7 @@ class ImageDirectoryDataset(object):
 
         batch_index is the index into the disk!
         '''
-                tick = time.time()
+        tick = time.time()
         if mode =='train':
             files = self.all_train_files[batch_index*batch_size: (batch_index+1)*batch_size]
         elif mode == 'test':
@@ -128,7 +150,8 @@ class ImageDirectoryDataset(object):
 
         tock = time.time()
         print "time taken:%s" % str(tock - tick)
-        return np.array(X_batch), np.array(y_batch)
+        self.CPU_X_train = np.array(X_batch)
+        self.CPU_y_train = np.array(y_batch)
 
     def process_single_file(self, filename):
         '''
@@ -136,7 +159,7 @@ class ImageDirectoryDataset(object):
         '''
         img = io.imread(filename)
         img = img.transpose(2,0,1)
-                img = transform.resize(img, (3,227,227))
+        img = transform.resize(img, (3,227,227))
         img -= self.mean_image
         label = filename.split('/')[-2] # HACKY!
         y = self.l2i[label]
@@ -160,7 +183,7 @@ class ImageDirectoryDataset(object):
         X_gpu = theano.shared(self.CPU_X_train[batch_index*batch_size:(batch_index+1)*batch_size].astype(theano.config.floatX)) 
         # T.cast for decomposibility???
         y_gpu = T.cast(theano.shared(self.CPU_y_train[batch_index*batch_size:(batch_index+1)*batch_size].astype(theano.config.floatX)), 'int32')
-                return X_gpu, y_gpu
+        return X_gpu, y_gpu
 
 
 
@@ -219,7 +242,8 @@ class ImageDirectoryDataset(object):
             # ==== [] ###
             # ok, now we have a new cpu batch. now we want to set the gpu values.
             real_gpu_batch = gpu_batch_index % self.gpu_batches_per_cpu_batch
-            self.set_GPU(real_gpu_batch)
+            self.curr_gpu_batch = gpu_batch_index
+            self.set_gpu(real_gpu_batch)
 
     def set_gpu(self, real_gpu_batch):
         self.GPU_X_train.set_value(self.CPU_X_train[real_gpu_batch*self.num_GPU_store:(real_gpu_batch+1)*self.num_GPU_store])
