@@ -1,8 +1,10 @@
 import theano
+import time
+import numpy as np
 import theano.tensor as T
 import os
 import sys
-from skimage import io, transformation, util
+from skimage import io, transform, util
 
 
 '''
@@ -28,6 +30,7 @@ hence, real_gpu_batch_index is gpu_batch_index MODULO gpu_batches_per_cpu_batch.
 if necessary, we update the necessary stuff.
 '''
 
+tensor5 = T.TensorType(theano.config.floatX, (False,)*5)
 def tensortype_from_shape(shape, intg=False):
 	if len(shape) == 1:
 		''' HACK!:'''
@@ -41,6 +44,9 @@ def tensortype_from_shape(shape, intg=False):
 		return T.tensor3
 	elif len(shape) == 4:
 		return T.tensor4
+        elif len(shape) == 5:
+                return tensor5
+
 
 
 class ImageDirectoryDataset(object):
@@ -61,7 +67,7 @@ class ImageDirectoryDataset(object):
 				class2
 				...
 		'''
-		self.check_dir(maindir_path)
+		#self.check_dir(maindir_path)
 		self.window_shape= window_shape
 		self.window_step = window_step
 
@@ -85,9 +91,9 @@ class ImageDirectoryDataset(object):
 
 
 
-	def get_X_batch_var(self, X_trains):
+	def get_X_batch_var(self):
 		return tensortype_from_shape(self.CPU_X_train.shape)()
-	def get_y_batch_var(self, y_train):
+	def get_y_batch_var(self):
 		return tensortype_from_shape(self.CPU_y_train.shape, intg=True)()
 
 
@@ -101,6 +107,7 @@ class ImageDirectoryDataset(object):
 
 		batch_index is the index into the disk!
 		'''
+                tick = time.time()
 		if mode =='train':
 			files = self.all_train_files[batch_index*batch_size: (batch_index+1)*batch_size]
 		elif mode == 'test':
@@ -115,6 +122,9 @@ class ImageDirectoryDataset(object):
 			X, y = self.process_single_file(filename) # this is because process_single_file will augment
 			X_batch.append(X)
 			y_batch.append(y)
+
+                tock = time.time()
+                print "time taken:%s" % str(tock - tick)
 		return np.array(X_batch), np.array(y_batch)
 
 	def process_single_file(self, filename):
@@ -123,14 +133,18 @@ class ImageDirectoryDataset(object):
 		'''
 		img = io.imread(filename)
 		img = img.transpose(2,0,1)
+                img = transform.resize(img, (3,227,227))
 		label = filename.split('/')[-2] # HACKY!
 		y = self.l2i[label]
 
 		# view is 1 x a x b x window shape.
-		view = util.view_as_windows(img, window_shape=self.window_shape, step=self.step)
+		view = util.view_as_windows(img, window_shape=self.window_shape, step=self.window_step)
 		# we want this to be num_windows x windows shape, so:
 		batches = view.reshape(np.prod(view.shape[:-3]), *view.shape[3:])
-		return batches, y
+                new_batches = []
+                for batch in batches:
+                    new_batches.append(transform.resize(batch,(3,227,227)))
+		return np.array(new_batches), y
 
 	def load_gpu(self, batch_index, batch_size):
 		'''
@@ -139,9 +153,10 @@ class ImageDirectoryDataset(object):
 		batch_index is the index into the CPU batch!
 
 		'''
-		X_gpu = theano.shared(self.CPU_X_train[batch_index*batch_size:(batch_index+1)*batch_size].astype(theano.config.floatX))
+		X_gpu = theano.shared(self.CPU_X_train[batch_index*batch_size:(batch_index+1)*batch_size].astype(theano.config.floatX)) 
 		# T.cast for decomposibility???
 		y_gpu = T.cast(theano.shared(self.CPU_y_train[batch_index*batch_size:(batch_index+1)*batch_size].astype(theano.config.floatX)), 'int32')
+                return X_gpu, y_gpu
 
 
 
@@ -226,4 +241,7 @@ class ImageDirectoryDataset(object):
 		givens = {self.X_batch_var[i]:self.X_tests[i] for i in range(len(self.X_tests))}
 		givens[self.y_batch_var] = self.y_test
 		return givens		
+
+if __name__ == '__main__':
+    ds = ImageDirectoryDataset('../../proj/Images', 100, 25)
 
