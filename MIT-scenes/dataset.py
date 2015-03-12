@@ -5,6 +5,7 @@ import theano.tensor as T
 import os
 import sys
 from skimage import io, transform, util
+import caffe2theano
 
 
 '''
@@ -82,13 +83,15 @@ class ImageDirectoryDataset(object):
         self.window_step = window_step
         self.init_train()
 
+        self.X_batch_shape = self.CPU_X_train.shape
         self.X_batch_var = self.get_X_batch_var()
         self.y_batch_var = self.get_y_batch_var()
 
         self.curr_gpu_batch = 0
         self.curr_cpu_batch = 0
 
-
+        mean_image = caffe2theano.conversion.convert_mean_image('/root/caffe/data/ilsvrc12/imagenet_mean.binaryproto')
+        self.mean_image = skimage.transform.resize(mean_image, (3,227,227))
 
 
     def get_X_batch_var(self):
@@ -134,6 +137,7 @@ class ImageDirectoryDataset(object):
         img = io.imread(filename)
         img = img.transpose(2,0,1)
                 img = transform.resize(img, (3,227,227))
+        img -= self.mean_image
         label = filename.split('/')[-2] # HACKY!
         y = self.l2i[label]
 

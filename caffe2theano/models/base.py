@@ -3,6 +3,16 @@ import lasagne.layers as layers
 import theano
 import theano.tensor as T
 import cPickle as pkl
+
+'''
+TODO: model class should not deal with any functions but a simple forward compile, as the solver does the rest.
+
+i.e, perhaps the model should have the predict function (as this is part of the model)
+'''
+
+
+
+
 def dump(model, fp):
 	'''
 	dumps the model to the given file path
@@ -44,7 +54,7 @@ class BaseModel(object):
 		Currently, this just compiles the forward pass (used for transfer learning without finetuning)
 		'''
 		self.compile_kwargs = kwargs
-		nOutputs = kwargs.get('nOutputs', 9)
+		nOutputs = kwargs.get('nOutputs', 1)
 		# get symbolic input from layer
 		symbolic_input = self.input_layer.input_var
 		# make list of outputs
