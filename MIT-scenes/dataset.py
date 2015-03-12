@@ -145,6 +145,8 @@ class ImageDirectoryDataset(object):
         y_batch = []
         for filename in files:
             X, y = self.process_single_file(filename) # this is because process_single_file will augment
+            if X == -1:
+                continue
             X_batch.append(X)
             y_batch.append(y)
 
@@ -159,7 +161,11 @@ class ImageDirectoryDataset(object):
         '''
         img = io.imread(filename)
         img = img.transpose(2,0,1)
-        img = transform.resize(img, (3,227,227))
+        try:
+            img = transform.resize(img, (3,227,227))
+        except:
+            print "image didn't have correct shape, continuing"
+            return -1, -1
         img -= self.mean_image
         label = filename.split('/')[-2] # HACKY!
         y = self.l2i[label]
