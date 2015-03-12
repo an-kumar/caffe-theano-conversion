@@ -160,8 +160,8 @@ class ImageDirectoryDataset(object):
         processes a single image file
         '''
         img = io.imread(filename)
-        img = img.transpose(2,0,1)
         try:
+            img = img.transpose(2,0,1)
             img = transform.resize(img, (3,227,227))
         except:
             print "image didn't have correct shape, continuing"
