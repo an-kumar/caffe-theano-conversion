@@ -111,14 +111,14 @@ class ImageDirectoryDataset(object):
         self.load_cpu(0,self.num_CPU_store)
         self.GPU_X_train, self.GPU_y_train = self.load_gpu(0, self.num_GPU_store)
 
-    def dump_to_pickles(self,mode='train'):
+    def dump_to_pickles(self,startbatch=0,mode='train'):
         if mode == 'train':
             size = self.train_size
         elif mode == 'test':
             size = self.test_size
             
         num_batches = int(np.ceil(self.train_size / float(self.num_CPU_store)))
-        for i in range(num_batches):
+        for i in range(startbatch,num_batches):
             self.load_cpu(i, self.num_CPU_store, mode)
             np.save('train_batch_%s' % str(i), self.CPU_X_train)
 
