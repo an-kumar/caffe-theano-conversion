@@ -282,8 +282,8 @@ class ImageDirectoryDataset(object):
         solver_batches_per_gpu_batch = T.cast(T.int_div(self.num_GPU_store,batch_size), 'int32')
         real_batch_index = T.cast(T.mod(batch_index, solver_batches_per_gpu_batch), 'int32')
 
-        givens = {self.X_batch_var[i]:self.X_trains[i][real_batch_index*batch_size:(real_batch_index+1)*batch_size] for i in range(len(self.X_trains)) }
-        givens[self.y_batch_var] = self.y_train[real_batch_index*batch_size:(real_batch_index+1)*batch_size]
+        givens = {self.X_batch_var:self.GPU_X_train[real_batch_index*batch_size:(real_batch_index+1)*batch_size]}
+        givens[self.y_batch_var] = self.GPU_y_train[real_batch_index*batch_size:(real_batch_index+1)*batch_size]
         return givens
 
     def test_givens(self):

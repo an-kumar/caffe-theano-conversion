@@ -186,6 +186,7 @@ class SGDMomentumSolver(BaseSolver):
 			test_func = None
 		# train
 		batches_per_epoch = int(np.ceil(float(dataset.train_size )/ batch_size))
+                test_batches_per_epoch = int(np.ceil(float(dataset.test_size) / batch_size))
 		loss_history = []
 		for epoch in range(num_epochs):
 			for batch in range(batches_per_epoch):
@@ -193,9 +194,15 @@ class SGDMomentumSolver(BaseSolver):
 				dataset.deal_with_batch(batch, batch_size)
 				loss_history.append(func(batch))
 			if epoch % 25 == 0:
+                            print "testing"
+                            for batch in range(batches_per_epoch):
+                                dataset.deal_with_batch(batch, batch_size,mode='test')
+
 				print "curr loss: %s" % (loss_history[-1])
 				if test_func is not None:
 					print test_func()
+
+                return loss_history
 
 
 

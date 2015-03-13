@@ -45,7 +45,10 @@ class GatedSingleInputLayer(lasagne.layers.Layer):
         return T.mean(outs, axis=1) # should be 10 x 4096
 
     def get_params(self):
-        return self.W + self.b
+        return [self.W] + self.get_bias_params()
+
+    def get_bias_params(self):
+        return [self.b]
 
     def get_output_shape_for(self, input_shape):
         return (input_shape[0], input_shape[2])
