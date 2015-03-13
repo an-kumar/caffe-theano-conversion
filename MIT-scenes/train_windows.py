@@ -93,8 +93,9 @@ lmodel.pred_func = T.mean(T.eq(pred, ds.y_batch_var), dtype=theano.config.floatX
 LEARNING_RATE =0.008
 MOMENTUM=0.9
 REG = .00001
-solv = SGDMomentumSolver(0, reg_scale=REG)
-solv.set_specific_lrs({'newsoftmax':LEARNING_RATE, 'gate':LEARNING_RATE})
+solv = SGDMomentumSolver(LEARNING_RATE, reg_scale=REG)
+solv.set_trainable_layers(['newsoftmax','gate'])
+# solv.set_specific_lrs({'newsoftmax':LEARNING_RATE, 'gate':LEARNING_RATE})
 # now set the solv specific lrs
 
 

@@ -48,12 +48,12 @@ class BaseSolver(object):
         if self.reg == 'l2':
             return lasagne.regularization.l2
 
-    def get_all_params(self, model, include_bias=True):
+    def get_all_trainable_params(self, model, include_bias=True):
         '''
-        finds all the parameters of a lasagne model
+        finds all the __trainable__ parameters of a lasagne model
         '''
         if include_bias:
-            return lasagne.layers.get_all_params(model.last_layer)
+            return sum([model.get_W_params_by_name(name) + model.get_b_params_by_name(name) for name in self.trainable_layer_names], [])
         else:
             return lasagne.layers.get_all_non_bias_params(model.last_layer)
 
@@ -144,14 +144,21 @@ class SGDMomentumSolver(BaseSolver):
         self.set_specific_b_lrs(lr_dict)
         self.set_specific_W_lrs(lr_dict)
 
+    def set_trainable_layers(self, layer_names):
+        self.trainable_layer_names = layer_names
+
     def solve(self, model, dataset, batch_size, num_epochs, include_bias=True):
+        if self.trainable_layer_names is None:
+            all_params = lasagne.layers.get_all_params(model.last_layer)
+        else:
+            all_params = self.get_all_trainable_params(model, include_bias=include_bias)
         # get the obj_loss, reg_loss
         X_batch = dataset.X_batch_var # could be a list
         y_batch = dataset.y_batch_var # could be a list
         obj = self.find_objective(model, self.objective)
         obj_loss = obj.get_loss(X_batch, target=y_batch)
 
-        all_params = self.get_all_params(model, include_bias=include_bias)
+        # all_params = self.get_all_trainable_params(model, include_bias=include_bias)
         reg_loss = self.get_reg_loss(model, include_bias=False)
 
         updates, all_lrs = self.get_updates(obj_loss + reg_loss, all_params)
