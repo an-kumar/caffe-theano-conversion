@@ -126,7 +126,7 @@ class SGDMomentumSolver(BaseSolver):
 		'''
 		# iterate through keys to overwrite already set keys
 		for key in lr_dict:
-			self.specific_W_lrs[key] = lr_dict[key]
+			self.specific_W_lrs[key] = np.cast[theano.config.floatX](lr_dict[key])
 
 	def set_specific_b_lrs(self, lr_dict):
 		'''
@@ -135,7 +135,7 @@ class SGDMomentumSolver(BaseSolver):
 		lr_dict : dict mapping layer name -> specific learning rate
 		'''
 		for key in lr_dict:
-			self.specific_b_lrs[key] = lr_dict[key]
+			self.specific_b_lrs[key] = np.cast[theano.config.floatX](lr_dict[key])
 
 	def set_specific_lrs(self, lr_dict):
 		'''
@@ -189,6 +189,7 @@ class SGDMomentumSolver(BaseSolver):
 		loss_history = []
 		for epoch in range(num_epochs):
 			for batch in range(batches_per_epoch):
+				print "BATCH: %s" % batch
 				dataset.deal_with_batch(batch, batch_size)
 				loss_history.append(func(batch))
 			if epoch % 25 == 0:

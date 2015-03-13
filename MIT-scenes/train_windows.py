@@ -78,8 +78,24 @@ for layer in new_layers[:-1][::-1]: # must reverse so that the shapes are correc
     layer.input_shape = layer.input_layer.get_output_shape()
 
 # now we continue to the gates
-gates = GatedSingleInputLayer(last_reshape)
+gates = GatedSingleInputLayer(last_reshape, name='gate')
 # dense and softmax (maybe one more dense???)
-dense = lasagne.layers.DenseLayer(gates, 67, nonlinearity=lasagne.nonlinearities.softmax)
+dense = lasagne.layers.DenseLayer(gates, 67, nonlinearity=lasagne.nonlinearities.softmax, name='newsoftmax')
 
 lmodel.__init__(dense)
+
+pred = T.argmax(
+    lmodel.get_output(ds.X_batch_var, deterministic=True), axis=1)
+lmodel.pred_func = T.mean(T.eq(pred, ds.y_batch_var), dtype=theano.config.floatX)
+LEARNING_RATE =0.008
+MOMENTUM=0.9
+REG = .00001
+solv = SGDMomentumSolver(0, reg_scale=REG)
+solv.set_specific_lrs({'newsoftmax':LEARNING_RATE, 'gate':LEARNING_RATE})
+# now set the solv specific lrs
+
+
+num_epochs= 1000
+solv.solve(lmodel, ds, 10, num_epochs)
+
+
