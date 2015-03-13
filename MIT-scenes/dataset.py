@@ -55,7 +55,7 @@ class ImageDirectoryDataset(object):
     '''
     for now, extremely simple. todo: decompose to BaseDataset
     '''
-    def __init__(self, maindir_path, num_CPU_store, num_GPU_store, window_shape=(3,64,64), window_step=32):
+    def __init__(self, maindir_path, num_CPU_store, num_GPU_store, window_shape=(3,64,64), window_step=32, batchsize=10):
         '''
         ASSUMPTIONS:
 
@@ -93,7 +93,9 @@ class ImageDirectoryDataset(object):
 
 
 
-        self.X_batch_shape = self.CPU_X_train.shape
+        self.X_batch_shape = list(self.CPU_X_train.shape)
+        self.X_batch_shape[0] = batchsize # for lasagne?
+        self.X_batch_shape = tuple(self.X_batch_shape)
         self.X_batch_var = self.get_X_batch_var()
         self.y_batch_var = self.get_y_batch_var()
 
@@ -137,8 +139,8 @@ class ImageDirectoryDataset(object):
 
         batch_index is the index into the disk!
         '''
-        self.CPU_X_train = np.load('%s_X_batch_%s' % (mode, str(batch_index)))
-        self.CPU_y_train = np.load('%s_y_batch_%s' % (mode, str(batch_index)))
+        self.CPU_X_train = np.load('%s_X_batch_%s.npy' % (mode, str(batch_index)))
+        self.CPU_y_train = np.load('%s_y_batch_%s.npy' % (mode, str(batch_index)))
 
 
 
