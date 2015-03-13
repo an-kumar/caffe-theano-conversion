@@ -4,6 +4,7 @@ import numpy as np
 import theano.tensor as T
 import os
 import sys
+import random
 from skimage import io, transform, util
 import caffe2theano
 
@@ -78,7 +79,7 @@ class ImageDirectoryDataset(object):
         self.l2i, self.i2l, self.all_train_files, self.all_test_files = self.init_dir(maindir_path)
         self.train_size = len(self.all_train_files)
         self.test_size = len(self.all_test_files)
-
+        random.shuffle(self.all_train_files)
         self.gpu_batches_per_cpu_batch = int(np.ceil(num_CPU_store/float(num_GPU_store)))
 
         
