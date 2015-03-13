@@ -117,10 +117,10 @@ class ImageDirectoryDataset(object):
         elif mode == 'test':
             size = self.test_size
             
-        num_batches = int(np.ceil(self.train_size / float(self.num_CPU_store)))
+        num_batches = int(np.ceil(size / float(self.num_CPU_store)))
         for i in range(startbatch,num_batches):
             self.load_cpu(i, self.num_CPU_store, mode)
-            np.save('train_batch_%s' % str(i), self.CPU_X_train)
+            np.save('%s_batch_%s' % str(i), self.CPU_X_train)
 
             
 
