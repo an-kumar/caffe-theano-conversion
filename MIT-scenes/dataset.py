@@ -123,6 +123,9 @@ class ImageDirectoryDataset(object):
             self.load_cpu(i, self.num_CPU_store, mode)
             np.save('%s_X_batch_%s' % (mode,str(i)), self.CPU_X_train)
             np.save('%s_y_batch_%s' % (mode, str(i)), self.CPU_y_train)
+            print "dumped. shapes:"
+            print self.CPU_X_train.shape
+            print self.CPU_y_train.shape
 
             
 
@@ -134,28 +137,33 @@ class ImageDirectoryDataset(object):
 
         batch_index is the index into the disk!
         '''
-        tick = time.time()
-        if mode =='train':
-            files = self.all_train_files[batch_index*batch_size: (batch_index+1)*batch_size]
-        elif mode == 'test':
-            files = self.all_test_files[batch_index*batch_size:(batch_index+1)*batch_size]
-        else:
-            raise Exception ("mode %s not valid for load_cpu" % mode)
+        self.CPU_X_train = np.load('%s_X_batch_%s' % (mode, str(batch_index)))
+        self.CPU_y_train = np.load('%s_y_batch_%s' % (mode, str(batch_index)))
 
-        # todo: make the following general, for decomposition
-        X_batch = []
-        y_batch = []
-        for filename in files:
-            X, y = self.process_single_file(filename) # this is because process_single_file will augment
-            if X is None:
-                continue
-            X_batch.append(X)
-            y_batch.append(y)
 
-        tock = time.time()
-        print "time taken:%s" % str(tock - tick)
-        self.CPU_X_train = np.array(X_batch)
-        self.CPU_y_train = np.array(y_batch)
+
+        # tick = time.time()
+        # if mode =='train':
+        #     files = self.all_train_files[batch_index*batch_size: (batch_index+1)*batch_size]
+        # elif mode == 'test':
+        #     files = self.all_test_files[batch_index*batch_size:(batch_index+1)*batch_size]
+        # else:
+        #     raise Exception ("mode %s not valid for load_cpu" % mode)
+
+        # # todo: make the following general, for decomposition
+        # X_batch = []
+        # y_batch = []
+        # for filename in files:
+        #     X, y = self.process_single_file(filename) # this is because process_single_file will augment
+        #     if X is None:
+        #         continue
+        #     X_batch.append(X)
+        #     y_batch.append(y)
+
+        # tock = time.time()
+        # print "time taken:%s" % str(tock - tick)
+        # self.CPU_X_train = np.array(X_batch)
+        # self.CPU_y_train = np.array(y_batch)
 
     def process_single_file(self, filename):
         '''

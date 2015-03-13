@@ -10,7 +10,7 @@ import caffe2theano
 import dataset
 
 lmodel = caffe2theano.conversion.convert('/root/caffe/models/bvlc_reference_caffenet/deploy.prototxt','/root/caffe/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel')
-ds = dataset.ImageDirectoryDataset('../../proj/Images', 1000, 250)
+ds = dataset.ImageDirectoryDataset('../../proj/Images', 250, 50)
 
 
 inp = lasagne.layers.InputLayer(ds.X_batch_shape)
