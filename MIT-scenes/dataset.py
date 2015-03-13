@@ -139,7 +139,7 @@ class ImageDirectoryDataset(object):
 
         batch_index is the index into the disk!
         '''
-        print "LOADING CPU BATCH: %s" % batch_index
+        print "LOADING CPU BATCH: %s, mode=%s" % (batch_index,mode)
         self.CPU_X_train = np.load('%s_X_batch_%s.npy' % (mode, str(batch_index)))
         self.CPU_y_train = np.load('%s_y_batch_%s.npy' % (mode, str(batch_index)))
 
@@ -257,7 +257,7 @@ class ImageDirectoryDataset(object):
             cpu_batch_index = gpu_batch_index / self.gpu_batches_per_cpu_batch
             if cpu_batch_index != self.curr_cpu_batch:
                 # now we need to load the next batch of the cpu
-                self.load_cpu(cpu_batch_index, self.num_CPU_store, mode='train')
+                self.load_cpu(cpu_batch_index, self.num_CPU_store, mode=mode)
                 self.curr_cpu_batch = cpu_batch_index
             # ==== [] ###
             # ok, now we have a new cpu batch. now we want to set the gpu values.
