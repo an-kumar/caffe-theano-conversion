@@ -13,8 +13,8 @@ class GatedSingleInputLayer(lasagne.layers.Layer):
     '''
     A layer that takes in multiple inputs *of the same dimensionality* and computes gates to combine them
     '''
-    def __init__(self, incoming, W=init.Uniform(), b = init.Constant(0.), nonlinearity=lasagne.nonlinearities.sigmoid, prob_func=lasagne.nonlinearities.softmax, **kwargs):
-        super(GatedMultipleInputsLayer,self).__init__(incomings,**kwargs)
+    def __init__(self, incoming, W=lasagne.init.Uniform(), b = lasagne.init.Constant(0.), nonlinearity=lasagne.nonlinearities.sigmoid, prob_func=lasagne.nonlinearities.softmax, **kwargs):
+        super(GatedSingleInputLayer,self).__init__(incoming,**kwargs)
         num_out = self.input_shape[2]
         # make gates
         self.W = self.create_param(W, (num_out,num_out))
@@ -26,15 +26,16 @@ class GatedSingleInputLayer(lasagne.layers.Layer):
 
     def get_output_for(self, input, *args, **kwargs):
         # compute gates
-        gs = self.nonlinearity(T.tensordot(input, self.W) + self.b.dimshuffle('x','x',0))
+        gs = self.nonlinearity(T.tensordot(input, self.W,axes=1) + self.b.dimshuffle('x','x',0))
         # gs is 10 x 36 x 4096
         # now turn to probability 
 
         # scan op to softmax each one
         def step(tens):
             out = self.prob_func(tens.transpose()).transpose()
+            return out
 
-        softmaxd = theano.scan(fn=step, sequences=gs) 
+        softmaxd, _ = theano.scan(fn=step, sequences=gs) 
         # now softmaxd should be 10 x 36 x 4096, but the 4096 across 36 should sum to a probability distribution
         # now elementwise multiplication
         outs = softmaxd * input
