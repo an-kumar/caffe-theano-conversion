@@ -1,4 +1,5 @@
 import conversion
+import time
 import os
 import theano
 import numpy as np
@@ -61,13 +62,18 @@ def test_similarity(model, net):
 	inp_shape= net.blobs['data'].data.shape
 	random_mat = np.random.randn(*inp_shape).astype(theano.config.floatX) 
 	
-	fprop = net.forward(**{net.inputs[0]:random_mat})
-	print fprop[fprop.keys()[0]].shape
+        tick = time.time()
+        for i in range(10):
+	    fprop = net.forward(**{net.inputs[0]:random_mat})
+	#print fprop[fprop.keys()[0]].shape
+	tock = time.time()
+        print "caffe took: %s" % (tock-  tick)
 	
-	
-	
-	outlist = model.forward(random_mat)
-	
+	tick = time.time()
+        for i in range(10):
+	    outlist = model.forward(random_mat)
+	tock = time.time()
+        print "lasagne took: %s" % (tock - tick)
 	print 'model forward'
 	
 	# print fprop vs outlist
@@ -104,7 +110,7 @@ def test_serialization(model):
 if __name__ == '__main__':
 	import argparse
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--prototxt", default='data/VGG_ILSVRC_16_layers_deploy.prototxt', help="model definition file")
-	parser.add_argument("--caffemodel", default='data/VGG_ILSVRC_16_layers.caffemodel',help="model binary")
+	parser.add_argument("--prototxt", default='../../caffe/models/bvlc_reference_caffenet/deploy.prototxt', help="model definition file")
+	parser.add_argument("--caffemodel", default='../../caffe/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel',help="model binary")
 	args = parser.parse_args()
 	main (args.prototxt, args.caffemodel)
