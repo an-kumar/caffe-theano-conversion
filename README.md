@@ -91,7 +91,7 @@ else:
 	""" % self.numGroups
 ```
 
-You should be able to not have that if statement at all, but I kept it in.
+You should be able to not have that if statement at all, but I kept it in. You will have to do the same change (the #define numGroups) change for ImageActs and WeightActs as well if you want to backprop through the convolutional layers; if you just want to run the forward function, that isn't needed.
 
 ## USAGE:
 You can test the repo by python tests.py.
