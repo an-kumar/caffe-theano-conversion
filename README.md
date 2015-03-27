@@ -1,4 +1,5 @@
 # caffe_theano_conversion
+This is part of a project for CS231N at Stanford University, written by Ankit Kumar, Mathematics major, Class of 2015
 
 This is a repository that allows you to convert pretrained caffe models into models in Lasagne, a thin wrapper around Theano. You can also convert a caffe model's architecture to an equivalent one in Lasagne. You do not need caffe installed to use this module.
 
